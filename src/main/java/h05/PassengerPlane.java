@@ -20,8 +20,8 @@ public class PassengerPlane extends Plane implements CarriesPassengers {
     }
 
     @Override
-    public void disembark(int passengerCount) {
-        this.passengerCount -= passengerCount;
+    public void disembark() {
+        this.passengerCount = 0;
     }
 
     public int getPassengerCount() {

@@ -19,7 +19,7 @@ public class Airspace {
     private final Set<Flying> flyingInAirspace = new HashSet<>();
 
     private Airspace(){
-        
+
     }
 
     void register(Flying flying){
@@ -33,6 +33,12 @@ public class Airspace {
 
     void scanAirspace(){
         System.out.println("Scanning...");
+
+        if (flyingInAirspace.isEmpty()){
+            System.out.println("Airspace is empty");
+            return;
+        }
+
         for (Flying flying : flyingInAirspace){
             System.out.print(flying.getIdentifier() + " is flying in airspace");
 

@@ -38,6 +38,7 @@ public abstract class Plane implements Flying {
 
         // if the plane does not have enough fuel to fly the distance, it will not fly
         if(!hasEnoughFuel(distance)){
+            System.out.println("Plane " + aircraftRegistration + " does not have enough fuel to fly " + distance + " km.");
             return 0;
         }
 //        double intendedConsumption = distance * getFuelConsumptionPerKilometer();
@@ -47,6 +48,7 @@ public abstract class Plane implements Flying {
         currentFuelLevel -= distance * getFuelConsumptionPerKilometer();
         //returns remaining fuel after the flight
 
+        System.out.println("Plane " + aircraftRegistration + " flew " + distance + " km and has " + currentFuelLevel + " liters of fuel left.");
         return currentFuelLevel;
     }
 

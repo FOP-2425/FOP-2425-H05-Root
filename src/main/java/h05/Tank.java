@@ -3,7 +3,7 @@ package h05;
 public class Tank implements Refuelling{
 
     public enum RefuellingMode {
-        FULL, SHOT, AMOUNT;
+        FULL, SHOT, AMOUNT
     }
 
     private final FuelType fuelType;
