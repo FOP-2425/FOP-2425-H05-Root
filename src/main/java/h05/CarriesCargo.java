@@ -1,8 +1,8 @@
 package h05;
 
 public interface CarriesCargo {
-    void loadFreight(char cargoWeight);
+    void loadContainer(int cargoWeight);
 
-    boolean containsMoreFreight();
-    char unloadNextFreight();
+    boolean hasFreightLoaded();
+    int unloadNextContainer();
 }

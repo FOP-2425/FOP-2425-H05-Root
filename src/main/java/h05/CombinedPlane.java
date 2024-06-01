@@ -4,32 +4,32 @@ import java.util.Stack;
 
 public class CombinedPlane extends PassengerPlane implements CarriesCargo{
 
-    private final Stack<Character> freight = new Stack<>();
+    private final Stack<Integer> freight = new Stack<>();
 
 
-    public CombinedPlane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel) {
-        super(aircraftRegistration, baseWeight, fuelType, maxFuelLevel);
+    public CombinedPlane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel, int crew) {
+        super(aircraftRegistration, baseWeight, fuelType, maxFuelLevel, crew);
     }
 
     @Override
-    public void loadFreight(char cargoWeight) {
+    public void loadContainer(int cargoWeight) {
         freight.push(cargoWeight);
     }
 
     @Override
-    public boolean containsMoreFreight() {
+    public boolean hasFreightLoaded() {
         return !freight.empty();
     }
 
     @Override
-    public char unloadNextFreight() {
+    public int unloadNextContainer() {
         return freight.pop();
     }
 
     @Override
     protected double mass() {
         int sumOfFreight = 0;
-        for(char f : freight){
+        for(int f : freight){
             sumOfFreight += f;
         }
 

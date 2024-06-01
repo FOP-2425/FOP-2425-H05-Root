@@ -1,6 +1,6 @@
 package h05;
 
-public abstract class Plane implements Flying{
+public abstract class Plane implements Flying {
 
     private final String  aircraftRegistration;
 
@@ -9,14 +9,14 @@ public abstract class Plane implements Flying{
     private double currentFuelLevel;
 
     private final FuelType fuelType;
-    private final double maxFuelLevel;
+    private final double fuelCapacity;
 
-    public Plane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel){
+    public Plane(String aircraftRegistration, int baseWeight, FuelType fuelType, double fuelCapacity){
         this.aircraftRegistration = aircraftRegistration;
         this.baseWeight = baseWeight;
         this.fuelType = fuelType;
         this.currentFuelLevel = 0;
-        this.maxFuelLevel = maxFuelLevel;
+        this.fuelCapacity = fuelCapacity;
     }
 
 
@@ -35,21 +35,31 @@ public abstract class Plane implements Flying{
     }
 
     public double fly(double distance){
-        double intendedConsumption = distance * getFuelConsumptionPerKilometer();
 
-        double possibleConsumption = Math.min(intendedConsumption, currentFuelLevel);
-        currentFuelLevel -= possibleConsumption;
+        // if the plane does not have enough fuel to fly the distance, it will not fly
+        if(!hasEnoughFuel(distance)){
+            return 0;
+        }
+//        double intendedConsumption = distance * getFuelConsumptionPerKilometer();
+//
+//        double possibleConsumption = Math.min(intendedConsumption, currentFuelLevel);
+//        currentFuelLevel -= possibleConsumption;
+        currentFuelLevel -= distance * getFuelConsumptionPerKilometer();
+        //returns remaining fuel after the flight
 
-        double actualDistance = possibleConsumption / getFuelConsumptionPerKilometer();
-        return actualDistance;
+        return currentFuelLevel;
+    }
+
+    public boolean hasEnoughFuel(double distance){
+        return currentFuelLevel >= distance * getFuelConsumptionPerKilometer();
     }
 
     public FuelType getFuelType() {
         return fuelType;
     }
 
-    public double getMaxFuelLevel() {
-        return maxFuelLevel;
+    public double getFuelCapacity() {
+        return fuelCapacity;
     }
 
     public double getCurrentFuelLevel() {

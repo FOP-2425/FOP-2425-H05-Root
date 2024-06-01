@@ -19,7 +19,7 @@ public class Airspace {
     private final Set<Flying> flyingInAirspace = new HashSet<>();
 
     private Airspace(){
-
+        
     }
 
     void register(Flying flying){
@@ -34,10 +34,10 @@ public class Airspace {
     void scanAirspace(){
         System.out.println("Scanning...");
         for (Flying flying : flyingInAirspace){
-            System.out.print(flying.getIdentifier());
+            System.out.print(flying.getIdentifier() + " is flying in airspace");
 
             if(flying instanceof PassengerPlane passengerPlane){
-                System.out.print(" (" + passengerPlane.getPeopleCount() + " PAX)");
+                System.out.print(" (" + passengerPlane.getPassengerCount() + " PAX)");
             }
 
             System.out.println();

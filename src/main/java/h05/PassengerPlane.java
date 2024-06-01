@@ -1,30 +1,35 @@
 package h05;
 
-public class PassengerPlane extends Plane implements CarriesPeople{
+public class PassengerPlane extends Plane implements CarriesPassengers {
 
     protected static final char AVERAGE_PASSENGER_WEIGHT = 95;
-    private int peopleCount = 0;
+    protected static final char AVERAGE_LUGGAGE_WEIGHT = 15;
 
-    public PassengerPlane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel) {
+    private int passengerCount = 0;
+
+    private final int crewCount;
+
+    public PassengerPlane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel, int crew) {
         super(aircraftRegistration, baseWeight, fuelType, maxFuelLevel);
+        this.crewCount = crew;
     }
 
     @Override
-    public void board(int peopleCount) {
-        this.peopleCount += peopleCount;
+    public void board(int passengerCount) {
+        this.passengerCount += passengerCount;
     }
 
     @Override
-    public void embark(int peopleCount) {
-        this.peopleCount -= peopleCount;
+    public void disembark(int passengerCount) {
+        this.passengerCount -= passengerCount;
     }
 
-    public int getPeopleCount() {
-        return peopleCount;
+    public int getPassengerCount() {
+        return passengerCount;
     }
 
     @Override
     protected double mass() {
-        return baseWeight + peopleCount * AVERAGE_PASSENGER_WEIGHT;
+        return baseWeight + passengerCount * AVERAGE_PASSENGER_WEIGHT + crewCount * AVERAGE_PASSENGER_WEIGHT + passengerCount * AVERAGE_LUGGAGE_WEIGHT;
     }
 }

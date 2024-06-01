@@ -28,11 +28,11 @@ public class Tank implements Refuelling{
             return;
         }
 
-        double missingFuel = plane.getMaxFuelLevel() - plane.getCurrentFuelLevel();
+        double missingFuel = plane.getFuelCapacity() - plane.getCurrentFuelLevel();
         if(refuellingMode == RefuellingMode.FULL){
             plane.refuel(missingFuel);
         } else if (refuellingMode == RefuellingMode.SHOT) {
-            double shotAmount = 0.05 * plane.getMaxFuelLevel();
+            double shotAmount = 0.05 * plane.getFuelCapacity();
 
             if(shotAmount < missingFuel){
                 plane.refuel(shotAmount);

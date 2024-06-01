@@ -27,7 +27,7 @@ public class TankerPlane extends Plane implements Refuelling{
 
     @Override
     public void refuel(Plane plane, double amount) {
-        double missingFuel = plane.getMaxFuelLevel() - plane.getCurrentFuelLevel();
+        double missingFuel = plane.getFuelCapacity() - plane.getCurrentFuelLevel();
         double actualAmount = Math.min(availableAmount[plane.getFuelType().ordinal()], Math.min(amount, missingFuel));
 
         availableAmount[plane.getFuelType().ordinal()] -= actualAmount;
