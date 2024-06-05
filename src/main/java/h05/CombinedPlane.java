@@ -33,7 +33,6 @@ public class CombinedPlane extends PassengerPlane implements CarriesCargo{
             sumOfFreight += f;
         }
 
-
         return super.mass() + sumOfFreight;
     }
 }
