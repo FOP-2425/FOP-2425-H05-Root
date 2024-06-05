@@ -11,6 +11,7 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        Runway runway01 = new Runway(2000);
         WeatherBalloon weatherBalloon = new WeatherBalloon(99);
         weatherBalloon.start();
 
