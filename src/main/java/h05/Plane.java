@@ -2,6 +2,7 @@ package h05;
 
 public abstract class Plane implements Flying {
 
+    private static final double CONSUMPTION_PER_KM_KG = 1.1494e-4;
     private final String  aircraftRegistration;
 
     protected final int baseWeight;
@@ -23,7 +24,7 @@ public abstract class Plane implements Flying {
     protected abstract double mass();
 
     protected double getFuelConsumptionPerKilometer(){
-        return mass() * fuelType.getConsumptionMultiplicator();
+        return CONSUMPTION_PER_KM_KG * mass() * fuelType.getConsumptionMultiplicator();
     }
 
     public void takeOff(){
@@ -35,24 +36,17 @@ public abstract class Plane implements Flying {
     }
 
     public void fly(double distance){
+        double neededFuel = distance * getFuelConsumptionPerKilometer();
 
         // if the plane does not have enough fuel to fly the distance, it will not fly
-        if(!hasEnoughFuel(distance)){
+        if(neededFuel > currentFuelLevel){
             System.out.println("Plane " + aircraftRegistration + " does not have enough fuel to fly " + distance + " km.");
             return;
         }
-//        double intendedConsumption = distance * getFuelConsumptionPerKilometer();
-//
-//        double possibleConsumption = Math.min(intendedConsumption, currentFuelLevel);
-//        currentFuelLevel -= possibleConsumption;
-        currentFuelLevel -= distance * getFuelConsumptionPerKilometer();
-        //returns remaining fuel after the flight
+
+        currentFuelLevel -= neededFuel;
 
         System.out.println("Plane " + aircraftRegistration + " flew " + distance + " km and has " + currentFuelLevel + " liters of fuel left.");
-    }
-
-    public boolean hasEnoughFuel(double distance){
-        return currentFuelLevel >= distance * getFuelConsumptionPerKilometer();
     }
 
     public FuelType getFuelType() {
@@ -69,6 +63,10 @@ public abstract class Plane implements Flying {
 
     public void refuel(double amount){
         currentFuelLevel += amount;
+
+        if(currentFuelLevel > fuelCapacity){
+            System.out.println("The Tank of Plane " + aircraftRegistration + " has overflowed!");
+        }
     }
 
     @Override
