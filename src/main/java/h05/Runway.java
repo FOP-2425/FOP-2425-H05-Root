@@ -5,7 +5,7 @@ public class Runway {
     private final int runwayLength;
 
     /*
-    Man müsste sich noch überlegen, wie Flugzeugtypen, die hier landen können, festgesetzt werden
+    Man könnte sich noch überlegen, wie Flugzeugtypen, die hier landen können, festgesetzt werden
      */
     public Runway(int runwayLength){
         this.runwayLength = runwayLength;
@@ -15,7 +15,7 @@ public class Runway {
         return runwayLength;
     }
     /*
-    hier müsste man sich noch die genaue Formel für die Landung überlegen
+    hier müsste man sich noch eine bessere Formel für die Landung überlegen
     */
     public static double calculateLandingDistance(double weight){
         return weight/40;
@@ -31,9 +31,9 @@ public class Runway {
     public void land(Plane plane){
         if(canLand(plane)){
             plane.land();
-            System.out.println(plane.getIdentifier() + " has landed successfully.");
+            System.out.println("Plane " + plane.getIdentifier() + " has landed successfully.");
         } else {
-            System.out.println(plane.getIdentifier() + " could not land. The runway is too short.");
+            System.out.println("Plane " + plane.getIdentifier() + " could not land. The runway is too short.");
         }
     }
 
