@@ -17,8 +17,8 @@ public class Runway {
     /*
     TODO: hier müsste man sich noch eine bessere Formel für die Landung überlegen
     */
-    public static double calculateLandingDistance(double weight){
-        return weight/40;
+    public static double calculateLandingDistance(double mass){
+        return mass/40;
     }
 
     public boolean canLand(Plane plane){
