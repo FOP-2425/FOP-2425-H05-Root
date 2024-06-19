@@ -13,7 +13,7 @@ public class Main {
 
         /*
         Die konkreten Zahlen sind noch nicht final und können sich ändern.
-        Wie kann instanceof genutzt werden?
+        TODO: Wie kann instanceof genutzt werden?
          */
         Runway runway01 = new Runway(2000);
         Runway runway02 = new Runway(4000);

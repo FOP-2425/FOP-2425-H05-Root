@@ -5,7 +5,7 @@ public class Runway {
     private final int runwayLength;
 
     /*
-    Man könnte sich noch überlegen, wie Flugzeugtypen, die hier landen können, festgesetzt werden
+    TODO: Man könnte sich noch überlegen, wie Flugzeugtypen, die hier landen können, festgesetzt werden
      */
     public Runway(int runwayLength){
         this.runwayLength = runwayLength;
@@ -15,7 +15,7 @@ public class Runway {
         return runwayLength;
     }
     /*
-    hier müsste man sich noch eine bessere Formel für die Landung überlegen
+    TODO: hier müsste man sich noch eine bessere Formel für die Landung überlegen
     */
     public static double calculateLandingDistance(double weight){
         return weight/40;
@@ -26,7 +26,7 @@ public class Runway {
     }
 
     /*
-    Man könnte auch stattdessen die land() methode in plane erweitern und diese hier weglassen
+    TODO: Man könnte auch stattdessen die land() methode in plane erweitern und diese hier weglassen
      */
     public void land(Plane plane){
         if(canLand(plane)){
