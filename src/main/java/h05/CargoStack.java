@@ -1,6 +1,6 @@
 package h05;
 
-public class Stack {
+public class CargoStack {
     private final java.util.Stack<Integer> stack = new java.util.Stack<Integer>();
     private int sum = 0;
 

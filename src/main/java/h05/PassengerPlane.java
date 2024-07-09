@@ -15,8 +15,8 @@ public class PassengerPlane extends Plane implements CarriesPassengers {
     }
 
     @Override
-    public void board(int passengerCount) {
-        this.passengerCount += passengerCount;
+    public void board(int passengersCount) {
+        this.passengerCount += passengersCount;
     }
 
     @Override

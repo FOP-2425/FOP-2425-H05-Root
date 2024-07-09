@@ -9,7 +9,7 @@ public class Tank implements Refuelling{
     }
 
     @Override
-    public void refuel(Plane plane) {
+    public void refuelPlane(Plane plane) {
         if(plane.getFuelType() != fuelType){
             return;
         }
