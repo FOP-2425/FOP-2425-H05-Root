@@ -3,10 +3,6 @@ package h05;
 public class Runway {
 
     private final int runwayLength;
-
-    /*
-    TODO: Man könnte sich noch überlegen, wie Flugzeugtypen, die hier landen können, festgesetzt werden
-     */
     public Runway(int runwayLength){
         this.runwayLength = runwayLength;
     }
@@ -14,9 +10,6 @@ public class Runway {
     public int getRunwayLength(){
         return runwayLength;
     }
-    /*
-    TODO: hier müsste man sich noch eine bessere Formel für die Landung überlegen
-    */
     public static double calculateLandingDistance(double mass){
         return mass/40;
     }
@@ -24,10 +17,6 @@ public class Runway {
     public boolean canLand(Plane plane){
         return calculateLandingDistance(plane.mass()) <= runwayLength;
     }
-
-    /*
-    TODO: Man könnte auch stattdessen die land() methode in plane erweitern und diese hier weglassen
-     */
     public void land(Plane plane){
         if(canLand(plane)){
             plane.land();
