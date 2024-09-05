@@ -22,24 +22,22 @@ public class H05_RubricProvider implements RubricProvider {
 
     private static final Criterion H5_1_3 = Criterion.builder()
         .shortDescription("H5.1.3 | Plane")
-        .maxPoints(7)
+        .maxPoints(6)
         .addChildCriteria(
             criterion("The Interface is correctly implemented into the Plane class.")
             criterion("The Plane class has the correct attributes.")
             criterion("The mass method functions correctly.")
             criterion("Refuel prints the right message.")
             criterion("The getFuelConsumptionPerKilometer method is implemented correctly.")
-            criterion("The fly method is implemented correctly.")
-            criterion("The takeOff method is implemented correctly.")
+            criterion("The fly and takeoff methods are implemented correctly.")
         )
         .build();
 
     private static final Criterion H5_1_4 = Criterion.builder()
         .shortDescription("H5.1.4 | Weather Balloon")
-        .maxPoints(2)
+        .maxPoints(1)
         .addChildCriteria(
-            criterion("The methods start and pop are implemented correctly.")
-            criterion("THe WeatherBalloon class is implemented correctly.")
+            criterion("THe WeatherBalloon class and its methods are implemented correctly.")
         )
         .build();
 
@@ -60,8 +58,8 @@ public class H05_RubricProvider implements RubricProvider {
         .addChildCriteria(
             criterion("The CarriesCargo interface is implemented correctly.")
             criterion("The CargoPlane class correctly implements the CarriesCargo interface.")
-            criterion("The loadContainer, hasFreightLoaded and unloadNextContainer methods are implemented correctly.")
             criterion("The mass method and constructor are implemented correctly.")
+            criterion("The loadContainer, hasFreightLoaded and unloadNextContainer methods are implemented correctly.")
         )
         .build();
 
@@ -91,11 +89,10 @@ public class H05_RubricProvider implements RubricProvider {
 
     private static final Criterion H5_3_3 = Criterion.builder()
         .shortDescription("H5.3.3 | TankerPlane")
-        .maxPoints(3)
+        .maxPoints(2)
         .addChildCriteria(
             criterion("The TankerPlane class implements the right interfaces and the constructor is implemented correctly.")
-            criterion("The loadFuel and mass methods are implemented correctly.")
-            criterion("The refuelPlane method is implemented correctly.")
+            criterion("The loadFuel, mass and refuelPlane methods are implemented correctly.")
         )
         .build();
 
@@ -110,12 +107,17 @@ public class H05_RubricProvider implements RubricProvider {
 
     private static final Criterion H5_5 = Criterion.builder()
         .shortDescription("H5.5 | Airspace")
-        .maxPoints(0)
+        .maxPoints(1)
+        .criterion("The scanAirspace method is implemented correctly.")
         .build();
 
     private static final Criterion H5_6 = Criterion.builder()
         .shortDescription("H5.6 | Spielwiese")
-        .maxPoints(0)
+        .maxPoints(2)
+        .addChildCriteria(
+            criterion("At least 10 points are implemented correctly.")
+            criterion("All points are implemented correctly")
+        )
         .build();
 
 }
