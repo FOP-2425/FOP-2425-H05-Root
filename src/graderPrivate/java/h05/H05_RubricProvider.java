@@ -1,14 +1,17 @@
-package h06;
+package h05;
 
 import org.sourcegrade.jagr.api.rubric.*;
 import static org.tudalgo.algoutils.tutor.general.jagr.RubricUtils.criterion;
 
+@SuppressWarnings("unused")
 public class H05_RubricProvider implements RubricProvider {
 
     private static final Criterion H5_1_1 = Criterion.builder()
         .shortDescription("H5.1.1 | Flying Interface")
         .maxPoints(1)
-        .criterion("Das Flying-Interface ist korrekt implementiert.")
+        .addChildCriteria(
+            criterion("Das Flying-Interface ist korrekt implementiert.")
+        )
         .build();
 
     private static final Criterion H5_1_2 = Criterion.builder()
@@ -39,6 +42,11 @@ public class H05_RubricProvider implements RubricProvider {
         .addChildCriteria(
             criterion("Die WeatherBalloon-Klasse und ihre Methoden sind korrekt implementiert.")
         )
+        .build();
+
+    private static final Criterion H5_1 = Criterion.builder()
+        .shortDescription("H5.1 | Basis")
+        .addChildCriteria(H5_1_1, H5_1_2, H5_1_3, H5_1_4)
         .build();
 
     private static final Criterion H5_2_1 = Criterion.builder()
@@ -72,10 +80,17 @@ public class H05_RubricProvider implements RubricProvider {
         )
         .build();
 
+    private static final Criterion H5_2 = Criterion.builder()
+        .shortDescription("H5.2 | Basis")
+        .addChildCriteria(H5_2_1, H5_2_2, H5_2_3)
+        .build();
+
     private static final Criterion H5_3_1 = Criterion.builder()
         .shortDescription("H5.3.1 | Betankung")
         .maxPoints(1)
-        .criterion("Das Refuelling-Interface ist korrekt implementiert.")
+        .addChildCriteria(
+            criterion("Das Refuelling-Interface ist korrekt implementiert.")
+        )
         .build();
 
     private static final Criterion H5_3_2 = Criterion.builder()
@@ -96,6 +111,11 @@ public class H05_RubricProvider implements RubricProvider {
         )
         .build();
 
+    private static final Criterion H5_3 = Criterion.builder()
+        .shortDescription("H5.3 | Tanken")
+        .addChildCriteria(H5_3_1, H5_3_2, H5_3_3)
+        .build();
+
     private static final Criterion H5_4 = Criterion.builder()
         .shortDescription("H5.4 | Start- und Landebahn")
         .maxPoints(2)
@@ -108,7 +128,9 @@ public class H05_RubricProvider implements RubricProvider {
     private static final Criterion H5_5 = Criterion.builder()
         .shortDescription("H5.5 | Luftraum")
         .maxPoints(1)
-        .criterion("Die Methode scanAirspace ist korrekt implementiert.")
+        .addChildCriteria(
+            criterion("Die Methode scanAirspace ist korrekt implementiert.")
+        )
         .build();
 
     private static final Criterion H5_6 = Criterion.builder()
@@ -119,4 +141,12 @@ public class H05_RubricProvider implements RubricProvider {
             criterion("Alle Punkte sind korrekt implementiert.")
         )
         .build();
+
+    @Override
+    public Rubric getRubric() {
+        return Rubric.builder()
+            .title("H05 | TBA")  // TODO: replace
+            .addChildCriteria(H5_1, H5_2, H5_3, H5_4, H5_5, H5_6)
+            .build();
+    }
 }
