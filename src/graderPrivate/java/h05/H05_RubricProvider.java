@@ -8,36 +8,36 @@ public class H05_RubricProvider implements RubricProvider {
     private static final Criterion H5_1_1 = Criterion.builder()
         .shortDescription("H5.1.1 | Flying Interface")
         .maxPoints(1)
-        .criterion("The Flying interface is implemented correctly.")
+        .criterion("Das Flying-Interface ist korrekt implementiert.")
         .build();
 
     private static final Criterion H5_1_2 = Criterion.builder()
         .shortDescription("H5.1.2 | FuelType")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("The FuelType enum is implemented correctly and with the correct values.")
-            criterion("The Constructor of the FuelType enum is implemented correctly.")
+            criterion("Das FuelType-Enum ist korrekt implementiert und enthält die richtigen Werte.")
+            criterion("Der Konstruktor des FuelType-Enums ist korrekt implementiert.")
         )
         .build();
 
     private static final Criterion H5_1_3 = Criterion.builder()
-        .shortDescription("H5.1.3 | Plane")
+        .shortDescription("H5.1.3 | Flugzeug")
         .maxPoints(6)
         .addChildCriteria(
-            criterion("The Interface is correctly implemented into the Plane class.")
-            criterion("The Plane class has the correct attributes.")
-            criterion("The mass method functions correctly.")
-            criterion("Refuel prints the right message.")
-            criterion("The getFuelConsumptionPerKilometer method is implemented correctly.")
-            criterion("The fly and takeoff methods are implemented correctly.")
+            criterion("Das Interface ist korrekt in die Flugzeugklasse implementiert.")
+            criterion("Die Flugzeugklasse hat die richtigen Attribute.")
+            criterion("Die Masse-Methode funktioniert korrekt.")
+            criterion("Die Refuel-Methode gibt die richtige Nachricht aus.")
+            criterion("Die getFuelConsumptionPerKilometer-Methode ist korrekt implementiert.")
+            criterion("Die Methoden fly und takeoff sind korrekt implementiert.")
         )
         .build();
 
     private static final Criterion H5_1_4 = Criterion.builder()
-        .shortDescription("H5.1.4 | Weather Balloon")
+        .shortDescription("H5.1.4 | Wetterballon")
         .maxPoints(1)
         .addChildCriteria(
-            criterion("THe WeatherBalloon class and its methods are implemented correctly.")
+            criterion("Die WeatherBalloon-Klasse und ihre Methoden sind korrekt implementiert.")
         )
         .build();
 
@@ -45,10 +45,10 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.2.1 | CarriesPassengers Interface")
         .maxPoints(4)
         .addChildCriteria(
-            criterion("The CarriesPassengers interface is implemented correctly.")
-            criterion("The PassengerPlane class correctly implements the CarriesPassengers interface.")
-            criterion("The board and disembark methods and getPassengerCount are implemented correctly.")
-            criterion("The constants and constructor are implemented correctly.")
+            criterion("Das CarriesPassengers-Interface ist korrekt implementiert.")
+            criterion("Die PassengerPlane-Klasse implementiert das CarriesPassengers-Interface korrekt.")
+            criterion("Die Methoden board, disembark und getPassengerCount sind korrekt implementiert.")
+            criterion("Die Konstanten und der Konstruktor sind korrekt implementiert.")
         )
         .build();
 
@@ -56,68 +56,67 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.2.2 | CarriesCargo Interface")
         .maxPoints(4)
         .addChildCriteria(
-            criterion("The CarriesCargo interface is implemented correctly.")
-            criterion("The CargoPlane class correctly implements the CarriesCargo interface.")
-            criterion("The mass method and constructor are implemented correctly.")
-            criterion("The loadContainer, hasFreightLoaded and unloadNextContainer methods are implemented correctly.")
+            criterion("Das CarriesCargo-Interface ist korrekt implementiert.")
+            criterion("Die CargoPlane-Klasse implementiert das CarriesCargo-Interface korrekt.")
+            criterion("Die Masse-Methode und der Konstruktor sind korrekt implementiert.")
+            criterion("Die Methoden loadContainer, hasFreightLoaded und unloadNextContainer sind korrekt implementiert.")
         )
         .build();
 
     private static final Criterion H5_2_3 = Criterion.builder()
-        .shortDescription("H5.2.3 | CombinedPlane")
+        .shortDescription("H5.2.3 | Kombiniertes Flugzeug")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("The CombinedPlane class correctly implements the CarriesPassengers and CarriesCargo interfaces.")
-            criterion("The class is completly correct.")
+            criterion("Die CombinedPlane-Klasse implementiert die Interfaces CarriesPassengers und CarriesCargo korrekt.")
+            criterion("Die Klasse ist vollständig korrekt.")
         )
         .build();
 
     private static final Criterion H5_3_1 = Criterion.builder()
-        .shortDescription("H5.3.1 | Refuelling")
+        .shortDescription("H5.3.1 | Betankung")
         .maxPoints(1)
-        .criterion("The Refuelling Interface is implemented correctly.")
+        .criterion("Das Refuelling-Interface ist korrekt implementiert.")
         .build();
 
     private static final Criterion H5_3_2 = Criterion.builder()
         .shortDescription("H5.3.2 | Tank")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("The Tank class is implemented correctly and with the right attributes.")
-            criterion("The refuelPlane method is implemented correctly.")
+            criterion("Die Tank-Klasse ist korrekt implementiert und enthält die richtigen Attribute.")
+            criterion("Die Methode refuelPlane ist korrekt implementiert.")
         )
         .build();
 
     private static final Criterion H5_3_3 = Criterion.builder()
-        .shortDescription("H5.3.3 | TankerPlane")
+        .shortDescription("H5.3.3 | Tanker-Flugzeug")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("The TankerPlane class implements the right interfaces and the constructor is implemented correctly.")
-            criterion("The loadFuel, mass and refuelPlane methods are implemented correctly.")
+            criterion("Die TankerPlane-Klasse implementiert die richtigen Interfaces und der Konstruktor ist korrekt implementiert.")
+            criterion("Die Methoden loadFuel, mass und refuelPlane sind korrekt implementiert.")
         )
         .build();
 
     private static final Criterion H5_4 = Criterion.builder()
-        .shortDescription("H5.4 | Runway")
+        .shortDescription("H5.4 | Start- und Landebahn")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("The Runway class is implemented correctly and with the right attributes.")
-            criterion("The methods land method is implemented correctly.")
+            criterion("Die Runway-Klasse ist korrekt implementiert und enthält die richtigen Attribute.")
+            criterion("Die Methode land ist korrekt implementiert.")
         )
         .build();
 
     private static final Criterion H5_5 = Criterion.builder()
-        .shortDescription("H5.5 | Airspace")
+        .shortDescription("H5.5 | Luftraum")
         .maxPoints(1)
-        .criterion("The scanAirspace method is implemented correctly.")
+        .criterion("Die Methode scanAirspace ist korrekt implementiert.")
         .build();
 
     private static final Criterion H5_6 = Criterion.builder()
         .shortDescription("H5.6 | Spielwiese")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("At least 10 points are implemented correctly.")
-            criterion("All points are implemented correctly")
+            criterion("Mindestens 10 Punkte sind korrekt implementiert.")
+            criterion("Alle Punkte sind korrekt implementiert.")
         )
         .build();
-
 }
