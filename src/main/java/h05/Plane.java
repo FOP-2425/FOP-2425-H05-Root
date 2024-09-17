@@ -62,7 +62,7 @@ public abstract class Plane implements Flying {
     }
 
     public void refuel(double amount){
-        currentFuelLevel += amount;
+        currentFuelLevel = Math.min(currentFuelLevel + amount, fuelCapacity);
 
         if(currentFuelLevel > fuelCapacity){
             System.out.println("The Tank of Plane " + aircraftRegistration + " has overflowed!");
