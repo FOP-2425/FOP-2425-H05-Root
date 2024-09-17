@@ -35,12 +35,19 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.1.3 | Flugzeug")
         .maxPoints(6)
         .addChildCriteria(
-            criterion("Das Interface ist korrekt in die Flugzeugklasse implementiert."),
-            criterion("Die Flugzeugklasse hat die richtigen Attribute."),
-            criterion("Die Masse-Methode funktioniert korrekt."),
-            criterion("Die Refuel-Methode gibt die richtige Nachricht aus."),
-            criterion("Die getFuelConsumptionPerKilometer-Methode ist korrekt implementiert."),
-            criterion("Die Methoden fly und takeoff sind korrekt implementiert.")
+            criterion("Das Interface ist korrekt in die Flugzeugklasse implementiert.",
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testHeader"))),
+            criterion("Die Flugzeugklasse hat die richtigen Attribute.",
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testFields"))),
+            criterion("Methode mass funktioniert korrekt.",
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testMass"))),
+            criterion("Methode refuel gibt die richtige Nachricht aus.",
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testRefuel"))),
+            criterion("Methode getFuelConsumptionPerKilometer ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testGetFuelConsumptionPerKilometer"))),
+            criterion("Die Methoden fly und takeOff sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testFly")),
+                JUnitTestRef.ofMethod(() -> PlaneTest.class.getDeclaredMethod("testTakeOff")))
         )
         .build();
 
