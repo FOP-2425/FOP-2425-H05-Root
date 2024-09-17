@@ -55,7 +55,11 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.1.4 | Wetterballon")
         .maxPoints(1)
         .addChildCriteria(
-            criterion("Die WeatherBalloon-Klasse und ihre Methoden sind korrekt implementiert.")
+            criterion("Die WeatherBalloon-Klasse und ihre Methoden sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testHeader")),
+                JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testStart")),
+                JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testPop")),
+                JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testGetIdentifier")))
         )
         .build();
 

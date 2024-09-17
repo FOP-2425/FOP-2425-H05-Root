@@ -45,6 +45,13 @@ public class Links {
     public static final Supplier<MethodLink> PLANE_FLY_LINK = getMethodLink(PLANE_LINK, "fly", double.class);
     public static final Supplier<MethodLink> PLANE_TAKE_OFF_LINK = getMethodLink(PLANE_LINK, "takeOff");
 
+    // Class WeatherBalloon
+    public static final Supplier<TypeLink> WEATHER_BALLOON_LINK = getTypeLinkByName("WeatherBalloon");
+    public static final Supplier<ConstructorLink> WEATHER_BALLOON_CONSTRUCTOR_LINK = getConstructorLink(WEATHER_BALLOON_LINK, int.class);
+    public static final Supplier<MethodLink> WEATHER_BALLOON_START_LINK = getMethodLink(WEATHER_BALLOON_LINK, "start");
+    public static final Supplier<MethodLink> WEATHER_BALLOON_POP_LINK = getMethodLink(WEATHER_BALLOON_LINK, "pop");
+    public static final Supplier<MethodLink> WEATHER_BALLOON_GET_IDENTIFIER_LINK = getMethodLink(WEATHER_BALLOON_LINK, "getIdentifier");
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }
