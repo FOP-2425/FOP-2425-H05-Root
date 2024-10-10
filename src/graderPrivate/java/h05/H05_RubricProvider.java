@@ -1,4 +1,4 @@
-package h06;
+package h05;
 
 import org.sourcegrade.jagr.api.rubric.*;
 import static org.tudalgo.algoutils.tutor.general.jagr.RubricUtils.criterion;
