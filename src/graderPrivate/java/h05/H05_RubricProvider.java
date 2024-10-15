@@ -127,7 +127,9 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.3.1 | Betankung")
         .maxPoints(1)
         .addChildCriteria(
-            criterion("Das Refuelling-Interface ist korrekt implementiert.")
+            criterion("Das Refuelling-Interface ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> RefuellingTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> RefuellingTest.class.getDeclaredMethod("testMethodHeaders")))
         )
         .build();
 

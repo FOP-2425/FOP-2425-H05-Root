@@ -91,6 +91,10 @@ public class Links {
     public static final Supplier<ConstructorLink> COMBINED_PLANE_CONSTRUCTOR_LINK = getConstructorLink(COMBINED_PLANE_LINK,
         () -> BasicTypeLink.of(String.class), () -> BasicTypeLink.of(int.class), FUEL_TYPE_LINK, () -> BasicTypeLink.of(double.class), () -> BasicTypeLink.of(int.class));
 
+    // Interface Refuelling
+    public static final Supplier<TypeLink> REFUELLING_LINK = getTypeLinkByName("Refuelling");
+    public static final Supplier<MethodLink> REFUELLING_REFUEL_PLANE_LINK = getMethodLink(REFUELLING_LINK, "refuelPlane", PLANE_LINK);
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }
