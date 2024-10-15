@@ -72,10 +72,18 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.2.1 | CarriesPassengers Interface")
         .maxPoints(4)
         .addChildCriteria(
-            criterion("Das CarriesPassengers-Interface ist korrekt implementiert."),
-            criterion("Die PassengerPlane-Klasse implementiert das CarriesPassengers-Interface korrekt."),
-            criterion("Die Methoden board, disembark und getPassengerCount sind korrekt implementiert."),
-            criterion("Die Konstanten und der Konstruktor sind korrekt implementiert.")
+            criterion("Das CarriesPassengers-Interface ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> CarriesPassengersTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> CarriesPassengersTest.class.getDeclaredMethod("testMethodHeaders"))),
+            criterion("Die PassengerPlane-Klasse implementiert das CarriesPassengers-Interface korrekt.",
+                JUnitTestRef.ofMethod(() -> PassengerPlaneTest.class.getDeclaredMethod("testClassHeader"))),
+            criterion("Die Methoden board, disembark und getPassengerCount sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> PassengerPlaneTest.class.getDeclaredMethod("testBoard")),
+                JUnitTestRef.ofMethod(() -> PassengerPlaneTest.class.getDeclaredMethod("testDisembark")),
+                JUnitTestRef.ofMethod(() -> PassengerPlaneTest.class.getDeclaredMethod("testGetPassengerCount"))),
+            criterion("Die Konstanten und der Konstruktor sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> PassengerPlaneTest.class.getDeclaredMethod("testConstants")),
+                JUnitTestRef.ofMethod(() -> PassengerPlaneTest.class.getDeclaredMethod("testConstructor")))
         )
         .build();
 

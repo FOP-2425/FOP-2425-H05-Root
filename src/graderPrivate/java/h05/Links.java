@@ -52,6 +52,24 @@ public class Links {
     public static final Supplier<MethodLink> WEATHER_BALLOON_POP_LINK = getMethodLink(WEATHER_BALLOON_LINK, "pop");
     public static final Supplier<MethodLink> WEATHER_BALLOON_GET_IDENTIFIER_LINK = getMethodLink(WEATHER_BALLOON_LINK, "getIdentifier");
 
+    // Interface CarriesPassengers
+    public static final Supplier<TypeLink> CARRIES_PASSENGERS_LINK = getTypeLinkByName("CarriesPassengers");
+    public static final Supplier<MethodLink> CARRIES_PASSENGERS_BOARD_LINK = getMethodLink(CARRIES_PASSENGERS_LINK, "board", int.class);
+    public static final Supplier<MethodLink> CARRIES_PASSENGERS_DISEMBARK_LINK = getMethodLink(CARRIES_PASSENGERS_LINK, "disembark");
+    public static final Supplier<MethodLink> CARRIES_PASSENGERS_GET_PASSENGER_COUNT_LINK = getMethodLink(CARRIES_PASSENGERS_LINK, "getPassengerCount");
+
+    // Class PassengerPlane
+    public static final Supplier<TypeLink> PASSENGER_PLANE_LINK = getTypeLinkByName("PassengerPlane");
+    public static final Supplier<FieldLink> PASSENGER_PLANE_AVERAGE_PEOPLE_WEIGHT_LINK = getFieldLinkByName(PASSENGER_PLANE_LINK, "AVERAGE_PEOPLE_WEIGHT");
+    public static final Supplier<FieldLink> PASSENGER_PLANE_AVERAGE_LUGGAGE_WEIGHT_LINK = getFieldLinkByName(PASSENGER_PLANE_LINK, "AVERAGE_LUGGAGE_WEIGHT");
+    public static final Supplier<FieldLink> PASSENGER_PLANE_PASSENGER_COUNT_LINK = getFieldLinkByName(PASSENGER_PLANE_LINK, "passengerCount");
+    public static final Supplier<FieldLink> PASSENGER_PLANE_CREW_COUNT_LINK = getFieldLinkByName(PASSENGER_PLANE_LINK, "crewCount");
+    public static final Supplier<ConstructorLink> PASSENGER_PLANE_CONSTRUCTOR_LINK = getConstructorLink(PASSENGER_PLANE_LINK,
+        () -> BasicTypeLink.of(String.class), () -> BasicTypeLink.of(int.class), FUEL_TYPE_LINK, () -> BasicTypeLink.of(double.class), () -> BasicTypeLink.of(int.class));
+    public static final Supplier<MethodLink> PASSENGER_PLANE_BOARD_LINK = getMethodLink(PASSENGER_PLANE_LINK, "board", int.class);
+    public static final Supplier<MethodLink> PASSENGER_PLANE_DISEMBARK_LINK = getMethodLink(PASSENGER_PLANE_LINK, "disembark");
+    public static final Supplier<MethodLink> PASSENGER_PLANE_GET_PASSENGER_COUNT_LINK = getMethodLink(PASSENGER_PLANE_LINK, "getPassengerCount");
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }
