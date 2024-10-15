@@ -86,6 +86,11 @@ public class Links {
     public static final Supplier<MethodLink> CARGO_PLANE_UNLOAD_NEXT_CONTAINER_LINK = getMethodLink(CARGO_PLANE_LINK, "unloadNextContainer");
     public static final Supplier<MethodLink> CARGO_PLANE_MASS_LINK = getMethodLink(CARGO_PLANE_LINK, "mass");
 
+    // Class CombinedPlane
+    public static final Supplier<TypeLink> COMBINED_PLANE_LINK = getTypeLinkByName("CombinedPlane");
+    public static final Supplier<ConstructorLink> COMBINED_PLANE_CONSTRUCTOR_LINK = getConstructorLink(COMBINED_PLANE_LINK,
+        () -> BasicTypeLink.of(String.class), () -> BasicTypeLink.of(int.class), FUEL_TYPE_LINK, () -> BasicTypeLink.of(double.class), () -> BasicTypeLink.of(int.class));
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }

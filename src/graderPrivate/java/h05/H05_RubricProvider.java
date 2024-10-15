@@ -110,8 +110,11 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.2.3 | Kombiniertes Flugzeug")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("Die CombinedPlane-Klasse implementiert die Interfaces CarriesPassengers und CarriesCargo korrekt."),
-            criterion("Die Klasse ist vollständig korrekt.")
+            criterion("Die CombinedPlane-Klasse implementiert die Interfaces CarriesPassengers und CarriesCargo korrekt.",
+                JUnitTestRef.ofMethod(() -> CombinedPlaneTest.class.getDeclaredMethod("testClassHeader"))),
+            criterion("Die Klasse ist vollständig korrekt.",
+                JUnitTestRef.ofMethod(() -> CombinedPlaneTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> CombinedPlaneTest.class.getDeclaredMethod("testConstructor")))
         )
         .build();
 
