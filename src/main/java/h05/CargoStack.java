@@ -1,7 +1,9 @@
 package h05;
 
-public class Stack {
-    private final java.util.Stack<Integer> stack = new java.util.Stack<Integer>();
+import java.util.Stack;
+
+public class CargoStack {
+    private final Stack<Integer> stack = new Stack<>();
     private int sum = 0;
 
     public boolean empty(){
@@ -22,5 +24,4 @@ public class Stack {
     public int getSum(){
         return sum;
     }
-
 }

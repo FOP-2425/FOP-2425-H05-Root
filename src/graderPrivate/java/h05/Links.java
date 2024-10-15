@@ -70,6 +70,22 @@ public class Links {
     public static final Supplier<MethodLink> PASSENGER_PLANE_DISEMBARK_LINK = getMethodLink(PASSENGER_PLANE_LINK, "disembark");
     public static final Supplier<MethodLink> PASSENGER_PLANE_GET_PASSENGER_COUNT_LINK = getMethodLink(PASSENGER_PLANE_LINK, "getPassengerCount");
 
+    // Interface CarriesCargo
+    public static final Supplier<TypeLink> CARRIES_CARGO_LINK = getTypeLinkByName("CarriesCargo");
+    public static final Supplier<MethodLink> CARRIES_CARGO_LOAD_CONTAINER_LINK = getMethodLink(CARRIES_CARGO_LINK, "loadContainer", int.class);
+    public static final Supplier<MethodLink> CARRIES_CARGO_HAS_FREIGHT_LOADED_LINK = getMethodLink(CARRIES_CARGO_LINK, "hasFreightLoaded");
+    public static final Supplier<MethodLink> CARRIES_CARGO_UNLOAD_NEXT_CONTAINER_LINK = getMethodLink(CARRIES_CARGO_LINK, "unloadNextContainer");
+
+    // Class CargoPlane
+    public static final Supplier<TypeLink> CARGO_PLANE_LINK = getTypeLinkByName("CargoPlane");
+    public static final Supplier<FieldLink> CARGO_PLANE_CONTAINERS_LINK = getFieldLinkByName(CARGO_PLANE_LINK, "containers");
+    public static final Supplier<ConstructorLink> CARGO_PLANE_CONSTRUCTOR_LINK = getConstructorLink(CARGO_PLANE_LINK,
+        () -> BasicTypeLink.of(String.class), () -> BasicTypeLink.of(int.class), FUEL_TYPE_LINK, () -> BasicTypeLink.of(double.class));
+    public static final Supplier<MethodLink> CARGO_PLANE_LOAD_CONTAINER_LINK = getMethodLink(CARGO_PLANE_LINK, "loadContainer", int.class);
+    public static final Supplier<MethodLink> CARGO_PLANE_HAS_FREIGHT_LOADED_LINK = getMethodLink(CARGO_PLANE_LINK, "hasFreightLoaded");
+    public static final Supplier<MethodLink> CARGO_PLANE_UNLOAD_NEXT_CONTAINER_LINK = getMethodLink(CARGO_PLANE_LINK, "unloadNextContainer");
+    public static final Supplier<MethodLink> CARGO_PLANE_MASS_LINK = getMethodLink(CARGO_PLANE_LINK, "mass");
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }

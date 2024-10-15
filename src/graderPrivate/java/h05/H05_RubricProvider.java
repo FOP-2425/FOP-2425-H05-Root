@@ -91,10 +91,18 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.2.2 | CarriesCargo Interface")
         .maxPoints(4)
         .addChildCriteria(
-            criterion("Das CarriesCargo-Interface ist korrekt implementiert."),
-            criterion("Die CargoPlane-Klasse implementiert das CarriesCargo-Interface korrekt."),
-            criterion("Die Masse-Methode und der Konstruktor sind korrekt implementiert."),
-            criterion("Die Methoden loadContainer, hasFreightLoaded und unloadNextContainer sind korrekt implementiert.")
+            criterion("Das CarriesCargo-Interface ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> CarriesCargoTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> CarriesCargoTest.class.getDeclaredMethod("testMethodHeaders"))),
+            criterion("Die CargoPlane-Klasse implementiert das CarriesCargo-Interface korrekt.",
+                JUnitTestRef.ofMethod(() -> CargoPlaneTest.class.getDeclaredMethod("testClassHeader"))),
+            criterion("Die Masse-Methode und der Konstruktor sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> CargoPlaneTest.class.getDeclaredMethod("testConstructor")),
+                JUnitTestRef.ofMethod(() -> CargoPlaneTest.class.getDeclaredMethod("testMass"))),
+            criterion("Die Methoden loadContainer, hasFreightLoaded und unloadNextContainer sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> CargoPlaneTest.class.getDeclaredMethod("testLoadContainer")),
+                JUnitTestRef.ofMethod(() -> CargoPlaneTest.class.getDeclaredMethod("testHasFreightLoaded")),
+                JUnitTestRef.ofMethod(() -> CargoPlaneTest.class.getDeclaredMethod("testUnloadNextContainer")))
         )
         .build();
 
