@@ -170,8 +170,11 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.4 | Start- und Landebahn")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("Die Runway-Klasse ist korrekt implementiert und enthält die richtigen Attribute."),
-            criterion("Die Methode land ist korrekt implementiert.")
+            criterion("Die Runway-Klasse ist korrekt deklariert und enthält die richtigen Attribute.",
+                JUnitTestRef.ofMethod(() -> RunwayTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> RunwayTest.class.getDeclaredMethod("testFields"))),
+            criterion("Die Methode land ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> RunwayTest.class.getDeclaredMethod("testLand", boolean.class)))
         )
         .build();
 
