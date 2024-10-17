@@ -44,6 +44,9 @@ public class Links {
     public static final Supplier<MethodLink> PLANE_GET_FUEL_CONSUMPTION_PER_KILOMETER_LINK = getMethodLink(PLANE_LINK, "getFuelConsumptionPerKilometer");
     public static final Supplier<MethodLink> PLANE_FLY_LINK = getMethodLink(PLANE_LINK, "fly", double.class);
     public static final Supplier<MethodLink> PLANE_TAKE_OFF_LINK = getMethodLink(PLANE_LINK, "takeOff");
+    public static final Supplier<MethodLink> PLANE_GET_FUEL_TYPE_LINK = getMethodLink(PLANE_LINK, "getFuelType");
+    public static final Supplier<MethodLink> PLANE_GET_FUEL_CAPACITY_LINK = getMethodLink(PLANE_LINK, "getFuelCapacity");
+    public static final Supplier<MethodLink> PLANE_GET_CURRENT_FUEL_LEVEL_LINK = getMethodLink(PLANE_LINK, "getCurrentFuelLevel");
 
     // Class WeatherBalloon
     public static final Supplier<TypeLink> WEATHER_BALLOON_LINK = getTypeLinkByName("WeatherBalloon");
@@ -94,6 +97,11 @@ public class Links {
     // Interface Refuelling
     public static final Supplier<TypeLink> REFUELLING_LINK = getTypeLinkByName("Refuelling");
     public static final Supplier<MethodLink> REFUELLING_REFUEL_PLANE_LINK = getMethodLink(REFUELLING_LINK, "refuelPlane", PLANE_LINK);
+
+    // Class Tank
+    public static final Supplier<TypeLink> TANK_LINK = getTypeLinkByName("Tank");
+    public static final Supplier<FieldLink> TANK_FUEL_TYPE_LINK = getFieldLinkByName(TANK_LINK, "fuelType");
+    public static final Supplier<ConstructorLink> TANK_CONSTRUCTOR_LINK = getConstructorLink(TANK_LINK, FUEL_TYPE_LINK);
 
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));

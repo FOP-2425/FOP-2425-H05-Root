@@ -137,8 +137,12 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.3.2 | Tank")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("Die Tank-Klasse ist korrekt implementiert und enthält die richtigen Attribute."),
-            criterion("Die Methode refuelPlane ist korrekt implementiert.")
+            criterion("Die Tank-Klasse ist korrekt deklariert und enthält die richtigen Attribute.",
+                JUnitTestRef.ofMethod(() -> TankTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> TankTest.class.getDeclaredMethod("testFields"))),
+            criterion("Die Methode refuelPlane ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> TankTest.class.getDeclaredMethod("testRefuelPlane")),
+                JUnitTestRef.ofMethod(() -> TankTest.class.getDeclaredMethod("testRefuelPlane_ErrorMessage")))
         )
         .build();
 
