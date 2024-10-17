@@ -150,8 +150,14 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.3.3 | Tanker-Flugzeug")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("Die TankerPlane-Klasse implementiert die richtigen Interfaces und der Konstruktor ist korrekt implementiert."),
-            criterion("Die Methoden loadFuel, mass und refuelPlane sind korrekt implementiert.")
+            criterion("Der Kopf der TankerPlane-Klasse sowie das Attribut availableAmount und der Konstruktor sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testClassHeader")),
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testFields")),
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testConstructor"))),
+            criterion("Die Methoden loadFuel, mass und refuelPlane sind korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testLoadFuel")),
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testMass")),
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testRefuelPlane")))
         )
         .build();
 

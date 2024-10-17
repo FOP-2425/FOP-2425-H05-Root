@@ -103,6 +103,14 @@ public class Links {
     public static final Supplier<FieldLink> TANK_FUEL_TYPE_LINK = getFieldLinkByName(TANK_LINK, "fuelType");
     public static final Supplier<ConstructorLink> TANK_CONSTRUCTOR_LINK = getConstructorLink(TANK_LINK, FUEL_TYPE_LINK);
 
+    // Class TankerPlane
+    public static final Supplier<TypeLink> TANKER_PLANE_LINK = getTypeLinkByName("TankerPlane");
+    public static final Supplier<FieldLink> TANKER_PLANE_AVAILABLE_AMOUNT_LINK = getFieldLinkByName(TANKER_PLANE_LINK, "availableAmount");
+    public static final Supplier<ConstructorLink> TANKER_PLANE_CONSTRUCTOR_LINK = getConstructorLink(TANKER_PLANE_LINK,
+        () -> BasicTypeLink.of(String.class), () -> BasicTypeLink.of(int.class), FUEL_TYPE_LINK, () -> BasicTypeLink.of(double.class));
+    public static final Supplier<MethodLink> TANKER_PLANE_LOAD_FUEL_LINK = getMethodLink(TANKER_PLANE_LINK, "loadFuel",
+        FUEL_TYPE_LINK, () -> BasicTypeLink.of(double.class));
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }
