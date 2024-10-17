@@ -182,7 +182,10 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.5 | Luftraum")
         .maxPoints(1)
         .addChildCriteria(
-            criterion("Die Methode scanAirspace ist korrekt implementiert.")
+            criterion("Die Methode scanAirspace ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> AirspaceTest.class.getDeclaredMethod("testScanAirspace_Empty")),
+                JUnitTestRef.ofMethod(() -> AirspaceTest.class.getDeclaredMethod("testScanAirspace_CargoPlane")),
+                JUnitTestRef.ofMethod(() -> AirspaceTest.class.getDeclaredMethod("testScanAirspace_PassengerPlane")))
         )
         .build();
 

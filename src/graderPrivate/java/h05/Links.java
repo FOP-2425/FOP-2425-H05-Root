@@ -118,6 +118,11 @@ public class Links {
     public static final Supplier<FieldLink> RUNWAY_RUNWAY_LENGTH_LINK = getFieldLinkByName(RUNWAY_LINK, "runwayLength");
     public static final Supplier<MethodLink> RUNWAY_LAND_LINK = getMethodLink(RUNWAY_LINK, "land", PLANE_LINK);
 
+    // Class Airspace
+    public static final Supplier<TypeLink> AIRSPACE_LINK = getTypeLinkByName("Airspace");
+    public static final Supplier<MethodLink> AIRSPACE_REGISTER_LINK = getMethodLink(AIRSPACE_LINK, "register", FLYING_LINK);
+    public static final Supplier<MethodLink> AIRSPACE_DEREGISTER_LINK = getMethodLink(AIRSPACE_LINK, "deregister", FLYING_LINK);
+
     private static Supplier<TypeLink> getTypeLinkByName(String name) {
         return Suppliers.memoize(() -> BASE_PACKAGE_LINK.get().getType(Matcher.of(typeLink -> typeLink.name().equals(name))));
     }
