@@ -19,6 +19,7 @@ import java.lang.reflect.Modifier;
 import java.util.Locale;
 import java.util.Set;
 
+import static h05.Links.AIRSPACE_DEREGISTER_LINK;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
 @TestForSubmission
@@ -100,7 +101,7 @@ public class PlaneTest {
 
         assertEquals(
             "The Tank of Plane %s has overflowed!".formatted(aircraftRegistration),
-            outputStream.toString(),
+            outputStream.toString().strip(),
             context,
             result -> "The message printed by method refuel is incorrect"
         );
@@ -153,6 +154,10 @@ public class PlaneTest {
             "Method fly is not public");
         assertEquals(void.class, flyLink.returnType().reflection(), emptyContext(), result ->
             "Return type of method fly is incorrect");
+        Airspace airspace = Airspace.get();
+        Set.copyOf(airspace.getFlyingInAirspace())
+            .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                "An exception occurred while invoking deregister(Flying)"));
 
         PrintStream originalOut = System.out;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -214,6 +219,9 @@ public class PlaneTest {
         Airspace airspace = Airspace.get();
         Object planeInstance = Mockito.mock(Links.PLANE_LINK.get().reflection(), Mockito.CALLS_REAL_METHODS);
 
+        Set.copyOf(airspace.getFlyingInAirspace())
+            .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                "An exception occurred while invoking deregister(Flying)"));
         call(() -> Links.PLANE_TAKE_OFF_LINK.get().invoke(planeInstance), emptyContext(), result ->
             "An exception occurred while invoking method takeOff");
         Set<?> flyingInAirspace = airspace.getFlyingInAirspace();
