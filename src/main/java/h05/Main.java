@@ -10,6 +10,8 @@ public class Main {
      * @param args program arguments, currently ignored
      */
     public static void main(String[] args) {
+        Airspace airspace = Airspace.get();
+        airspace.scanAirspace();
 
         /*
         Die konkreten Zahlen sind noch nicht final und können sich ändern.
@@ -31,7 +33,7 @@ public class Main {
         passengerPlane.board(100);
         passengerPlane.takeOff();
 
-        Airspace.get().scanAirspace();
+        airspace.scanAirspace();
 
         CargoPlane cargoPlane = new CargoPlane("D-AFFF", 8000, FuelType.JetB, 1500);
         cargoPlane.loadContainer(1000);
@@ -39,8 +41,12 @@ public class Main {
 
         passengerPlane.disembark();
 
+        airspace.scanAirspace();
+
         cargoPlane.takeOff();
         cargoPlane.fly(1000);
+
+        airspace.scanAirspace();
 
         CombinedPlane combinedPlane = new CombinedPlane("D-ABBB", 9000, FuelType.AvGas, 10700, 5);
         tankerPlane.refuel(combinedPlane);
@@ -49,15 +55,15 @@ public class Main {
         combinedPlane.loadContainer(400);
         combinedPlane.takeOff();
         combinedPlane.fly(3000);
-        Airspace.get().scanAirspace();
+        airspace.scanAirspace();
 
         runway01.land(combinedPlane);
         runway02.land(cargoPlane);
 
-        Airspace.get().scanAirspace();
+        airspace.scanAirspace();
+
         weatherBalloon.pop();
-        Airspace.get().scanAirspace();
 
-
+        airspace.scanAirspace();
     }
 }
