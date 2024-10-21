@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
+import static h05.Links.AIRSPACE_DEREGISTER_LINK;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
 @TestForSubmission
@@ -29,6 +30,9 @@ public class WeatherBalloonTest {
     @Test
     public void testStart() {
         Airspace airspace = Airspace.get();
+        Set.copyOf(airspace.getFlyingInAirspace())
+            .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                "An exception occurred while invoking deregister(Flying)"));
         Object weatherBalloonInstance = Mockito.mock(Links.WEATHER_BALLOON_LINK.get().reflection(), Mockito.CALLS_REAL_METHODS);
 
         call(() -> Links.WEATHER_BALLOON_START_LINK.get().invoke(weatherBalloonInstance), emptyContext(), result ->
@@ -43,6 +47,9 @@ public class WeatherBalloonTest {
     @Test
     public void testPop() throws ReflectiveOperationException {
         Airspace airspace = Airspace.get();
+        Set.copyOf(airspace.getFlyingInAirspace())
+            .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                "An exception occurred while invoking deregister(Flying)"));
         Object weatherBalloonInstance = Mockito.mock(Links.WEATHER_BALLOON_LINK.get().reflection(), Mockito.CALLS_REAL_METHODS);
         Field flyingInAirspaceField = Airspace.class.getDeclaredField("flyingInAirspace");
         flyingInAirspaceField.trySetAccessible();
