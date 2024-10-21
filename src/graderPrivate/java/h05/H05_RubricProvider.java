@@ -193,8 +193,10 @@ public class H05_RubricProvider implements RubricProvider {
         .shortDescription("H5.6 | Spielwiese")
         .maxPoints(2)
         .addChildCriteria(
-            criterion("Mindestens 10 Punkte sind korrekt implementiert."),
-            criterion("Alle Punkte sind korrekt implementiert.")
+            criterion("Der Luftraum ist bis nach dem Start von \"GAG-67\" korrekt.",
+                JUnitTestRef.ofMethod(() -> MainTest.class.getDeclaredMethod("testMain_FirstScans", JsonParameterSet.class))),
+            criterion("Der Luftraum ist bei jedem Scan korrekt.",
+                JUnitTestRef.ofMethod(() -> MainTest.class.getDeclaredMethod("testMain_AllScans", JsonParameterSet.class)))
         )
         .build();
 
