@@ -1,7 +1,11 @@
 package h05;
 
+import h05.transform.SolutionMergingClassTransformer;
 import org.sourcegrade.jagr.api.rubric.*;
+import org.sourcegrade.jagr.api.testing.RubricConfiguration;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
+
+import java.util.List;
 
 import static org.tudalgo.algoutils.tutor.general.jagr.RubricUtils.criterion;
 
@@ -206,5 +210,26 @@ public class H05_RubricProvider implements RubricProvider {
             .title("H05 | TBA")  // TODO: replace
             .addChildCriteria(H5_1, H5_2, H5_3, H5_4, H5_5, H5_6)
             .build();
+    }
+
+    @Override
+    public void configure(RubricConfiguration configuration) {
+        configuration.addTransformer(new SolutionMergingClassTransformer("h05", List.of(
+            "h05.Airspace",
+            "h05.CargoPlane",
+            "h05.CargoStack",
+            "h05.CarriesCargo",
+            "h05.CarriesPassengers",
+            "h05.CombinedPlane",
+            "h05.Flying",
+            "h05.FuelType",
+            "h05.Main",
+            "h05.PassengerPlane",
+            "h05.Plane",
+            "h05.Refuelling",
+            "h05.Runway",
+            "h05.Tank",
+            "h05.TankerPlane",
+            "h05.WeatherBalloon")));
     }
 }

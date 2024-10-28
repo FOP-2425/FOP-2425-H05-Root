@@ -22,6 +22,7 @@ jagr {
             rubricProviderName.set("h05.H05_RubricProvider")
             configureDependencies {
                 implementation(libs.algoutils.tutor)
+                implementation(libs.asm.tree)
             }
         }
     }
