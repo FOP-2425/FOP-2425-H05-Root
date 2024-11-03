@@ -1,7 +1,14 @@
-package h05.transform;
+package h05.transform.util;
 
+import h05.transform.SolutionClassNode;
+import h05.transform.SolutionMergingClassTransformer;
+import h05.transform.SubmissionClassInfo;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -88,5 +95,38 @@ public class TransformationUtils {
             localsIndex += (types[i].getSort() == Type.LONG || types[i].getSort() == Type.DOUBLE) ? 2 : 1;
         }
         return localsIndex;
+    }
+
+    public static SolutionClassNode readSolutionClass(String className) {
+        ClassReader solutionClassReader;
+        String solutionClassFilePath = "/classes/%s.bin".formatted(className);
+        try (InputStream is = SolutionMergingClassTransformer.class.getResourceAsStream(solutionClassFilePath)) {
+            if (is == null) {
+                throw new IOException("No such resource: " + solutionClassFilePath);
+            }
+            solutionClassReader = new ClassReader(is);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        SolutionClassNode solutionClassNode = new SolutionClassNode(className);
+        solutionClassReader.accept(solutionClassNode, 0);
+        return solutionClassNode;
+    }
+
+    public static SubmissionClassInfo readSubmissionClass(TransformationContext transformationContext, String className) {
+        ClassReader submissionClassReader;
+        String submissionClassFilePath = "/%s.class".formatted(className);
+        try (InputStream is = SolutionMergingClassTransformer.class.getResourceAsStream(submissionClassFilePath)) {
+            submissionClassReader = new ClassReader(is);
+        } catch (IOException e) {
+            return null;
+        }
+        SubmissionClassInfo submissionClassInfo = new SubmissionClassInfo(
+            transformationContext,
+            submissionClassReader.getClassName(),
+            new ForceSignatureAnnotationProcessor(submissionClassReader)
+        );
+        submissionClassReader.accept(submissionClassInfo, 0);
+        return submissionClassInfo;
     }
 }

@@ -1,54 +1,48 @@
 package h05.transform;
 
-import kotlin.Pair;
-import kotlin.Triple;
+import h05.transform.util.FieldHeader;
+import h05.transform.util.MethodHeader;
+import h05.transform.util.TransformationContext;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.tudalgo.algoutils.tutor.general.match.MatchingUtils;
 
 import java.util.*;
 
-import static h05.transform.TransformationUtils.*;
+import static h05.transform.util.TransformationUtils.*;
 import static org.objectweb.asm.Opcodes.*;
 
 class SubmissionClassVisitor extends ClassVisitor {
 
     private final boolean defaultTransformationsOnly;
+    private final TransformationContext transformationContext;
     private final String className;
-    private final String projectPrefix;
-    private final ForceSignatureAnnotationProcessor fsAnnotationProcessor;
+    private final SubmissionClassInfo submissionClassInfo;
 
-    private final Map<String, FieldNode> fieldNodes;
-    private final Map<String, String> fieldNameMapping = new HashMap<>();
-    private final Map<String, FieldReplacement.FieldHeader> visitedFields = new HashMap<>();
-    private final Map<String, Object> constantFieldValues = new HashMap<>();
+    private final Set<FieldHeader> visitedFields = new HashSet<>();
+    private final Map<FieldHeader, FieldNode> solutionFieldNodes;
 
-    private final Map<String, Map<String, MethodNode>> methodNodes;
-    private final Map<String, List<String>> visitedMethods = new HashMap<>();
-
-    SubmissionClassVisitor(ClassVisitor classVisitor, String className, String projectPrefix) {
-        this(classVisitor, className, projectPrefix, null, null);
-    }
+    private final Set<MethodHeader> visitedMethods = new HashSet<>();
+    private final Map<MethodHeader, MethodNode> solutionMethodNodes;
 
     SubmissionClassVisitor(ClassVisitor classVisitor,
-                           String className,
-                           String projectPrefix,
-                           ForceSignatureAnnotationProcessor forceSignatureAnnotationProcessor,
-                           SolutionClassNode solutionClassNode) {
+                           TransformationContext transformationContext,
+                           String submissionClassName) {
         super(ASM9, classVisitor);
-        this.className = className;
-        this.projectPrefix = projectPrefix;
-        this.fsAnnotationProcessor = forceSignatureAnnotationProcessor;
+        this.transformationContext = transformationContext;
+        this.className = transformationContext.getSubmissionClassInfo(submissionClassName).getComputedClassName();
+        this.submissionClassInfo = transformationContext.getSubmissionClassInfo(submissionClassName);
 
-        if (forceSignatureAnnotationProcessor != null && solutionClassNode != null) {
+        Optional<SolutionClassNode> solutionClass = submissionClassInfo.getSolutionClass();
+        if (solutionClass.isPresent()) {
             this.defaultTransformationsOnly = false;
-            this.fieldNodes = solutionClassNode.getFields();
-            this.methodNodes = solutionClassNode.getMethods();
+            this.solutionFieldNodes = solutionClass.get().getFields();
+            this.solutionMethodNodes = solutionClass.get().getMethods();
         } else {
+            System.err.printf("No corresponding solution class found for %s. Only applying default transformations.%n", submissionClassName);
             this.defaultTransformationsOnly = true;
-            this.fieldNodes = Collections.emptyMap();
-            this.methodNodes = Collections.emptyMap();
+            this.solutionFieldNodes = Collections.emptyMap();
+            this.solutionMethodNodes = Collections.emptyMap();
         }
     }
 
@@ -58,42 +52,21 @@ class SubmissionClassVisitor extends ClassVisitor {
             return super.visitField(access, name, descriptor, signature, value);
         }
 
-        String computedName;
-        if (fsAnnotationProcessor.fieldIdentifierIsForced(name)) {
-            computedName = fsAnnotationProcessor.forcedFieldIdentifier(name);
-        } else {
-            // find best matching field in solution
-            computedName = fieldNodes.keySet()
-                .stream()
-                .map(s -> new Pair<>(s, MatchingUtils.similarity(name, s)))
-                .filter(pair -> pair.getSecond() >= 0.90)
-                .max(Comparator.comparing(Pair::getSecond))
-                .map(Pair::getFirst)
-                .orElse(name);  // if no match was found, assume the field was added by the submission's author
-        }
-        fieldNameMapping.put(name, computedName);
-        // if field is static and has a default value (outside of <clinit>)
-        if ((access & ACC_STATIC) != 0 && value != null) {
-            constantFieldValues.put(computedName, value);  // record for initialization later
-        }
-        visitedFields.put(computedName, new FieldReplacement.FieldHeader(access, name, descriptor, signature));
-        return super.visitField(access,
-            computedName,
-            FieldReplacement.INTERNAL_DESCRIPTOR,
-            "L%s<%s>;".formatted(FieldReplacement.INTERNAL_NAME, signature),
-            null);
+        FieldHeader fieldHeader = submissionClassInfo.getComputedFieldHeader(name);
+        visitedFields.add(fieldHeader);
+        return fieldHeader.toFieldVisitor(getDelegate(), value);
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        String methodName = name;
-        visitedMethods.computeIfAbsent(name, k -> new ArrayList<>()).add(descriptor);
+        MethodHeader methodHeader = submissionClassInfo.getComputedMethodHeader(name, descriptor);
+        visitedMethods.add(methodHeader);
 
-        return new MethodVisitor(ASM9, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+        return new MethodVisitor(ASM9, methodHeader.toMethodVisitor(getDelegate())) {
             @Override
             public void visitCode() {
-                // if method is abstract, skip transformation
-                if ((access & ACC_ABSTRACT) != 0) {
+                // if method is abstract or lambda, skip transformation
+                if ((access & ACC_ABSTRACT) != 0 || ((access & ACC_SYNTHETIC) != 0 && name.startsWith("lambda$"))) {
                     super.visitCode();
                     return;
                 }
@@ -185,10 +158,8 @@ class SubmissionClassVisitor extends ClassVisitor {
                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z",
                         false);
                     super.visitJumpInsn(IFNE, submissionCodeLabel); // jump to label if useStudentImpl(...) == true
-                    // replay instructions from solution, if present
-                    Optional.of(methodNodes.get(name))
-                        .map(map -> map.get(descriptor))
-                        .ifPresent(methodNode -> methodNode.accept(getDelegate()));
+                    // replay instructions from solution
+                    solutionMethodNodes.get(methodHeader).accept(getDelegate());
                 }
 
                 // calculate the frame for the beginning of the submission code
@@ -210,95 +181,30 @@ class SubmissionClassVisitor extends ClassVisitor {
                     super.visitFrame(F_FULL, parameterTypes.length, parameterTypes, 0, null);
                 }
                 super.visitLabel(submissionCodeLabel);
-                // else execute original code
+                // visit original code
                 super.visitCode();
             }
 
             @Override
             public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
                 // skip transformation if only default transformations are applied or owner is not part of the submission
-                if (defaultTransformationsOnly || !owner.startsWith(projectPrefix)) {
+                if (defaultTransformationsOnly || !owner.startsWith(transformationContext.getProjectPrefix())) {
                     super.visitFieldInsn(opcode, owner, name, descriptor);
                 } else {
-                    // writing to field
-                    if (opcode == PUTFIELD || opcode == PUTSTATIC) {
-                        boxType(getDelegate(), Type.getType(descriptor));
-                        if (methodName.equals("<init>")) { // if in constructor, initialize fields
-                            FieldReplacement.FieldHeader originalFieldHeader = visitedFields.get(name);
-
-                            super.visitTypeInsn(NEW, FieldReplacement.INTERNAL_NAME);
-                            super.visitInsn(DUP_X1);
-                            super.visitInsn(SWAP); // swap to keep actual value on top of stack
-                            super.visitLdcInsn(originalFieldHeader.access());
-                            super.visitInsn(SWAP); // keep swapping...
-                            super.visitLdcInsn(originalFieldHeader.descriptor());
-                            super.visitInsn(SWAP); // and swapping...
-                            if (originalFieldHeader.signature() == null) { // signature may be null, LDC doesn't like that
-                                super.visitInsn(ACONST_NULL);
-                            } else {
-                                super.visitLdcInsn(originalFieldHeader.signature());
-                            }
-                            super.visitInsn(SWAP); // last one
-                            super.visitMethodInsn(INVOKESPECIAL,
-                                FieldReplacement.INTERNAL_NAME,
-                                "<init>",
-                                "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V",
-                                false);
-                            super.visitFieldInsn(opcode, owner, fieldNameMapping.get(name), FieldReplacement.INTERNAL_DESCRIPTOR);
-                        } else {
-                            if (opcode == PUTFIELD) {
-                                super.visitInsn(SWAP); // need the objectref to get the field
-                                super.visitFieldInsn(GETFIELD, owner, fieldNameMapping.get(name), FieldReplacement.INTERNAL_DESCRIPTOR);
-                            } else {
-                                super.visitFieldInsn(GETSTATIC, owner, fieldNameMapping.get(name), FieldReplacement.INTERNAL_DESCRIPTOR);
-                            }
-                            super.visitInsn(SWAP); // swap value and fieldref for invocation
-                            super.visitMethodInsn(INVOKEVIRTUAL,
-                                FieldReplacement.INTERNAL_NAME,
-                                "set",
-                                "(Ljava/lang/Object;)V",
-                                false);
-                        }
-                    } else { // reading from field
-                        super.visitFieldInsn(opcode, owner, fieldNameMapping.getOrDefault(name, name), FieldReplacement.INTERNAL_DESCRIPTOR);
-                        super.visitMethodInsn(INVOKEVIRTUAL,
-                            FieldReplacement.INTERNAL_NAME,
-                            "get",
-                            "()Ljava/lang/Object;",
-                            false);
-                        unboxType(getDelegate(), Type.getType(descriptor));
-                    }
+                    FieldHeader fieldHeader = transformationContext.getSubmissionClassInfo(owner).getComputedFieldHeader(name);
+                    super.visitFieldInsn(opcode, fieldHeader.owner(), fieldHeader.name(), fieldHeader.descriptor());
                 }
             }
 
             @Override
             public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-                super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
-            }
-
-            @Override
-            public void visitEnd() {
-                // add initialization for static fields with Integer, Float, Long, Double or String values
-                if (methodName.equals("<clinit>")) {
-                    constantFieldValues.forEach((name, value) -> {
-                        FieldReplacement.FieldHeader originalFieldHeader = visitedFields.get(name);
-
-                        super.visitTypeInsn(NEW, FieldReplacement.INTERNAL_NAME);
-                        super.visitInsn(DUP);
-                        super.visitLdcInsn(originalFieldHeader.access());
-                        super.visitLdcInsn(originalFieldHeader.descriptor());
-                        super.visitLdcInsn(originalFieldHeader.signature());
-                        super.visitLdcInsn(value);
-                        boxType(getDelegate(), Type.getType(originalFieldHeader.descriptor()));
-                        super.visitMethodInsn(INVOKESPECIAL,
-                            FieldReplacement.INTERNAL_NAME,
-                            "<init>",
-                            "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V",
-                            false);
-                        super.visitFieldInsn(PUTSTATIC, className, name, FieldReplacement.INTERNAL_DESCRIPTOR);
-                    });
+                // skip transformation if only default transformations are applied or owner is not part of the submission
+                if (defaultTransformationsOnly || !owner.startsWith(transformationContext.getProjectPrefix())) {
+                    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+                } else {
+                    MethodHeader methodHeader = transformationContext.getSubmissionClassInfo(owner).getComputedMethodHeader(name, descriptor);
+                    super.visitMethodInsn(opcode, methodHeader.owner(), methodHeader.name(), methodHeader.descriptor(), isInterface);
                 }
-                super.visitEnd();
             }
 
             private void buildInvocation(Type[] argumentTypes) {
@@ -327,16 +233,20 @@ class SubmissionClassVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        // add missing methods (including lambdas)
-        methodNodes.entrySet()
-            .stream()
-            .flatMap(entry -> entry.getValue()
-                .entrySet()
+        if (!defaultTransformationsOnly) {
+            // add missing fields
+            solutionFieldNodes.entrySet()
                 .stream()
-                .map(subentry -> new Triple<>(entry.getKey(), subentry.getKey(), subentry.getValue())))
-            .filter(triple -> !visitedMethods.containsKey(triple.getFirst()) || !visitedMethods.get(triple.getFirst()).contains(triple.getSecond()))
-            .map(Triple::getThird)
-            .forEach(methodNode -> methodNode.accept(getDelegate()));
+                .filter(entry -> !visitedFields.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .forEach(fieldNode -> fieldNode.accept(getDelegate()));
+            // add missing methods (including lambdas)
+            solutionMethodNodes.entrySet()
+                .stream()
+                .filter(entry -> !visitedMethods.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .forEach(methodNode -> methodNode.accept(getDelegate()));
+        }
         super.visitEnd();
     }
 }
