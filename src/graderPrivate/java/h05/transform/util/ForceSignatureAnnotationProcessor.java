@@ -194,6 +194,8 @@ public class ForceSignatureAnnotationProcessor {
 
         private String identifier;
         private String descriptor;
+        private Type returnType;
+        private final List<Type> parameterTypes = new ArrayList<>();
 
         ForceSignatureAnnotationVisitor() {
             super(Opcodes.ASM9);
@@ -201,10 +203,38 @@ public class ForceSignatureAnnotationProcessor {
 
         @Override
         public void visit(String name, Object value) {
-            if (name.equals("identifier")) {
-                identifier = (String) value;
-            } else if (name.equals("descriptor")) {
-                descriptor = (String) value;
+            switch (name) {
+                case "identifier" -> identifier = (String) value;
+                case "descriptor" -> descriptor = (String) value;
+                case "returnType" -> returnType = (Type) value;
+            }
+        }
+
+        @Override
+        public AnnotationVisitor visitArray(String name) {
+            if (name.equals("parameterTypes")) {
+                return new ParameterTypesVisitor();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void visitEnd() {
+            if ((descriptor == null || descriptor.isEmpty()) && returnType != null) {
+                descriptor = Type.getMethodDescriptor(returnType, parameterTypes.toArray(Type[]::new));
+            }
+        }
+
+        private class ParameterTypesVisitor extends AnnotationVisitor {
+
+            private ParameterTypesVisitor() {
+                super(Opcodes.ASM9);
+            }
+
+            @Override
+            public void visit(String name, Object value) {
+                parameterTypes.add((Type) value);
             }
         }
     }
