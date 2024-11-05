@@ -12,7 +12,11 @@ import java.io.InputStream;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public class TransformationUtils {
+/**
+ * A collection of utility methods useful for bytecode transformations.
+ * @author Daniel Mangold
+ */
+public final class TransformationUtils {
 
     private TransformationUtils() {}
 
@@ -97,6 +101,12 @@ public class TransformationUtils {
         return localsIndex;
     }
 
+    /**
+     * Attempts to read and process a solution class from {@code resources/classes/}.
+     *
+     * @param className the name of the solution class
+     * @return the resulting {@link SolutionClassNode} object
+     */
     public static SolutionClassNode readSolutionClass(String className) {
         ClassReader solutionClassReader;
         String solutionClassFilePath = "/classes/%s.bin".formatted(className);
@@ -113,6 +123,13 @@ public class TransformationUtils {
         return solutionClassNode;
     }
 
+    /**
+     * Attempts to read and process a submission class.
+     *
+     * @param transformationContext a {@link TransformationContext} object
+     * @param className             the name of the submission class
+     * @return the resulting {@link SubmissionClassInfo} object
+     */
     public static SubmissionClassInfo readSubmissionClass(TransformationContext transformationContext, String className) {
         ClassReader submissionClassReader;
         String submissionClassFilePath = "/%s.class".formatted(className);

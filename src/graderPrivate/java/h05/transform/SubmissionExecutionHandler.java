@@ -62,6 +62,8 @@ import java.util.regex.Pattern;
  * </pre>
  *
  * @see SolutionMergingClassTransformer
+ * @see SubmissionClassVisitor
+ * @author Daniel Mangold
  */
 @SuppressWarnings("unused")
 public class SubmissionExecutionHandler {

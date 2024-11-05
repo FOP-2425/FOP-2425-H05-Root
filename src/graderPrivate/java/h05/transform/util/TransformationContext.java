@@ -5,32 +5,27 @@ import h05.transform.SubmissionClassInfo;
 
 import java.util.Map;
 
-public class TransformationContext {
+/**
+ * A record for holding context information for the transformation process.
+ *
+ * @param projectPrefix     the root package for all submission classes
+ * @param solutionClasses   a mapping of solution class names to their respective {@link SolutionClassNode}
+ * @param submissionClasses a mapping of submission class names to their respective {@link SubmissionClassInfo}
+ * @author Daniel Mangold
+ */
+public record TransformationContext(
+    String projectPrefix,
+    Map<String, SolutionClassNode> solutionClasses,
+    Map<String, SubmissionClassInfo> submissionClasses
+) {
 
-    private final String projectPrefix;
-    private final Map<String, SolutionClassNode> solutionClasses;
-    private final Map<String, SubmissionClassInfo> submissionClasses;
-
-    public TransformationContext(String projectPrefix,
-                                 Map<String, SolutionClassNode> solutionClasses,
-                                 Map<String, SubmissionClassInfo> submissionClasses) {
-        this.projectPrefix = projectPrefix;
-        this.solutionClasses = solutionClasses;
-        this.submissionClasses = submissionClasses;
-    }
-
-    public String getProjectPrefix() {
-        return projectPrefix;
-    }
-
-    public Map<String, SolutionClassNode> getSolutionClasses() {
-        return solutionClasses;
-    }
-
-    public Map<String, SubmissionClassInfo> getSubmissionClasses() {
-        return submissionClasses;
-    }
-
+    /**
+     * Returns the {@link SubmissionClassInfo} for a given submission class name.
+     * If no mapping exists in {@link #submissionClasses}, will attempt to compute one.
+     *
+     * @param submissionClassName the submission class name
+     * @return the {@link SubmissionClassInfo} object
+     */
     public SubmissionClassInfo getSubmissionClassInfo(String submissionClassName) {
         return submissionClasses.computeIfAbsent(submissionClassName,
             className -> TransformationUtils.readSubmissionClass(this, className));

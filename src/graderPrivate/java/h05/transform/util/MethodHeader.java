@@ -5,13 +5,34 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.Objects;
 
+/**
+ * A record holding information on the header of a method as declared in java bytecode.
+ *
+ * @param owner      the method's owner or declaring class
+ * @param access     the method's modifiers
+ * @param name       the method's name
+ * @param descriptor the method's descriptor / parameter types + return type
+ * @param signature  the method's signature, if using type parameters
+ * @param exceptions exceptions declared in the method's {@code throws} clause
+ * @author Daniel Mangold
+ */
 public record MethodHeader(String owner, Integer access, String name, String descriptor, String signature, String[] exceptions) {
 
+    /**
+     * Visits a method in the given class visitor using the information stored in this record.
+     *
+     * @param delegate the class visitor to use
+     * @return the resulting {@link MethodVisitor}
+     */
     public MethodVisitor toMethodVisitor(ClassVisitor delegate) {
         return delegate.visitMethod(access, name, descriptor, signature, exceptions);
     }
 
-    // TODO: include owner and parent classes if possible
+    /**
+     * Two instances of {@link MethodHeader} are considered equal if their names and descriptors are equal.
+     * TODO: include owner and parent classes if possible
+     * @inheritDoc
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

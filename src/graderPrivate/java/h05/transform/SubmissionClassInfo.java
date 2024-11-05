@@ -16,6 +16,14 @@ import java.util.*;
 
 import static org.objectweb.asm.Opcodes.*;
 
+/**
+ * A class that holds information on a submission class.
+ * This class will attempt to find a corresponding solution class and map its members
+ * to the ones defined in the solution class.
+ * If no solution class can be found, for example because the submission class was added
+ * as a utility class, it will map its members to itself to remain usable.
+ * @author Daniel Mangold
+ */
 public class SubmissionClassInfo extends ClassVisitor {
 
     private final TransformationContext transformationContext;
@@ -34,6 +42,13 @@ public class SubmissionClassInfo extends ClassVisitor {
     // Mapping of methods in submission => usable methods
     private final Map<MethodHeader, MethodHeader> methods = new HashMap<>();
 
+    /**
+     * Constructs a new {@link SubmissionClassInfo} instance.
+     *
+     * @param transformationContext a {@link TransformationContext} object
+     * @param className             the name of the submission class
+     * @param fsAnnotationProcessor a {@link ForceSignatureAnnotationProcessor} for the submission class
+     */
     public SubmissionClassInfo(TransformationContext transformationContext,
                                String className,
                                ForceSignatureAnnotationProcessor fsAnnotationProcessor) {
@@ -46,7 +61,7 @@ public class SubmissionClassInfo extends ClassVisitor {
             this.computedClassName = fsAnnotationProcessor.forcedClassIdentifier();
         } else {
             // If not forced, get the closest matching solution class (at least 90% similarity)
-            this.computedClassName = transformationContext.getSolutionClasses()
+            this.computedClassName = transformationContext.solutionClasses()
                 .keySet()
                 .stream()
                 .map(s -> new Pair<>(s, MatchingUtils.similarity(originalClassName, s)))
@@ -55,17 +70,39 @@ public class SubmissionClassInfo extends ClassVisitor {
                 .map(Pair::getFirst)
                 .orElse(originalClassName);
         }
-        this.solutionClass = transformationContext.getSolutionClasses().get(computedClassName);
+        this.solutionClass = transformationContext.solutionClasses().get(computedClassName);
     }
 
+    /**
+     * Returns the computed class name.
+     * The computed name is the name of the associated solution class, if one is present.
+     * If no solution class is present, the computed names equals the original submission class name.
+     *
+     * @return the computed class name
+     */
     public String getComputedClassName() {
         return computedClassName;
     }
 
+    /**
+     * Returns the solution class associated with this submission class.
+     *
+     * @return an {@link Optional} object wrapping the associated solution class
+     */
     public Optional<SolutionClassNode> getSolutionClass() {
         return Optional.ofNullable(solutionClass);
     }
 
+    /**
+     * Returns the computed field header for the given field name.
+     * The computed field header is the field header of the corresponding field in the solution class,
+     * if one is present.
+     * If no solution class is present, the computed field header equals the original field header
+     * in the submission class.
+     *
+     * @param name the field name
+     * @return the computed field header
+     */
     public FieldHeader getComputedFieldHeader(String name) {
         return fields.entrySet()
             .stream()
@@ -75,6 +112,17 @@ public class SubmissionClassInfo extends ClassVisitor {
             .orElse(null);
     }
 
+    /**
+     * Returns the computed method header for the given method signature.
+     * The computed method header is the method header of the corresponding method in the solution class,
+     * if one is present.
+     * If no solution class is present, the computed method header equals the original method header
+     * in the submission class.
+     *
+     * @param name       the method name
+     * @param descriptor the method descriptor
+     * @return the computed method header
+     */
     public MethodHeader getComputedMethodHeader(String name, String descriptor) {
         return methods.entrySet()
             .stream()
@@ -150,6 +198,13 @@ public class SubmissionClassInfo extends ClassVisitor {
         }
     }
 
+    /**
+     * Recursively resolves the members of superclasses and interfaces.
+     *
+     * @param superClassMembers a set for recording class members
+     * @param superClass        the name of the superclass to process
+     * @param interfaces        the names of the interfaces to process
+     */
     private void resolveSuperClassMembers(Set<Triple<String, Map<FieldHeader, FieldHeader>, Map<MethodHeader, MethodHeader>>> superClassMembers,
                                           String superClass,
                                           String[] interfaces) {
@@ -161,9 +216,15 @@ public class SubmissionClassInfo extends ClassVisitor {
         }
     }
 
+    /**
+     * Recursively resolves the members of the given class.
+     *
+     * @param superClassMembers a set for recording class members
+     * @param className         the name of the class / interface to process
+     */
     private void resolveSuperClassMembers(Set<Triple<String, Map<FieldHeader, FieldHeader>, Map<MethodHeader, MethodHeader>>> superClassMembers,
                                           String className) {
-        if (className.startsWith(transformationContext.getProjectPrefix())) {
+        if (className.startsWith(transformationContext.projectPrefix())) {
             SubmissionClassInfo submissionClassInfo = transformationContext.getSubmissionClassInfo(className);
             superClassMembers.add(new Triple<>(className, submissionClassInfo.fields, submissionClassInfo.methods));
             resolveSuperClassMembers(superClassMembers, submissionClassInfo.superClass, submissionClassInfo.interfaces);

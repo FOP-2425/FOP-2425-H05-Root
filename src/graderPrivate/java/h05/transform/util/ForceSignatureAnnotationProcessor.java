@@ -5,35 +5,74 @@ import transform.ForceSignature;
 
 import java.util.*;
 
+/**
+ * A processor for the {@link ForceSignature} annotation.
+ * An instance of this class processes and holds information on a single class and its members.
+ * @author Daniel Mangold
+ */
 public class ForceSignatureAnnotationProcessor {
 
-    // Class / Type level
+    /**
+     * The forced identifier of the class, if any.
+     */
     private String forcedClassIdentifier;
 
-    // Field level
-    private final Map<FieldHeader, FieldHeader> forcedFieldIdentifiers = new HashMap<>();
+    /**
+     * A mapping of the actual field header to the forced one.
+     */
+    private final Map<FieldHeader, FieldHeader> forcedFieldsMapping = new HashMap<>();
 
-    // Constructor / Method level
-    private final Map<MethodHeader, MethodHeader> forcedMethodSignatures = new HashMap<>();
+    /**
+     * A mapping of the actual method header to the forced one.
+     */
+    private final Map<MethodHeader, MethodHeader> forcedMethodsMapping = new HashMap<>();
 
+    /**
+     * Constructs a new {@link ForceSignatureAnnotationProcessor} instance and processes the
+     * {@link ForceSignature} annotation using the given class reader.
+     *
+     * @param reader the class reader to use for processing
+     */
     public ForceSignatureAnnotationProcessor(ClassReader reader) {
         reader.accept(new ClassLevelVisitor(reader.getClassName()), 0);
     }
 
+    /**
+     * Whether the class identifier / name is forced.
+     *
+     * @return true, if forced, otherwise false
+     */
     public boolean classIdentifierIsForced() {
         return forcedClassIdentifier != null;
     }
 
+    /**
+     * Returns the forced class identifier.
+     *
+     * @return the forced class identifier
+     */
     public String forcedClassIdentifier() {
         return forcedClassIdentifier.replace('.', '/');
     }
 
+    /**
+     * Whether the given field is forced.
+     *
+     * @param identifier the original identifier / name of the field
+     * @return true, if forced, otherwise false
+     */
     public boolean fieldIdentifierIsForced(String identifier) {
         return forcedFieldHeader(identifier) != null;
     }
 
+    /**
+     * Returns the field header for a forced field.
+     *
+     * @param identifier the original identifier / name of the field
+     * @return the field header
+     */
     public FieldHeader forcedFieldHeader(String identifier) {
-        return forcedFieldIdentifiers.entrySet()
+        return forcedFieldsMapping.entrySet()
             .stream()
             .filter(entry -> identifier.equals(entry.getKey().name()))
             .findAny()
@@ -41,12 +80,26 @@ public class ForceSignatureAnnotationProcessor {
             .orElse(null);
     }
 
+    /**
+     * Whether the given method is forced.
+     *
+     * @param identifier the original identifier / name of the method
+     * @param descriptor the original descriptor of the method
+     * @return true, if forced, otherwise false
+     */
     public boolean methodSignatureIsForced(String identifier, String descriptor) {
         return forcedMethodHeader(identifier, descriptor) != null;
     }
 
+    /**
+     * Returns the method header for a forced method.
+     *
+     * @param identifier the original identifier / name of the method
+     * @param descriptor the original descriptor of the method
+     * @return the method header
+     */
     public MethodHeader forcedMethodHeader(String identifier, String descriptor) {
-        return forcedMethodSignatures.entrySet()
+        return forcedMethodsMapping.entrySet()
             .stream()
             .filter(entry -> identifier.equals(entry.getKey().name()) && descriptor.equals(entry.getKey().descriptor()))
             .findAny()
@@ -54,6 +107,9 @@ public class ForceSignatureAnnotationProcessor {
             .orElse(null);
     }
 
+    /**
+     * A visitor for processing class-level annotations.
+     */
     private class ClassLevelVisitor extends ClassVisitor {
 
         private final String name;
@@ -97,7 +153,7 @@ public class ForceSignatureAnnotationProcessor {
             for (FieldLevelVisitor fieldLevelVisitor : fieldLevelVisitors) {
                 ForceSignatureAnnotationVisitor annotationVisitor = fieldLevelVisitor.annotationVisitor;
                 if (annotationVisitor == null) continue;
-                forcedFieldIdentifiers.put(
+                forcedFieldsMapping.put(
                     new FieldHeader(fieldLevelVisitor.owner,
                         fieldLevelVisitor.access,
                         fieldLevelVisitor.name,
@@ -114,7 +170,7 @@ public class ForceSignatureAnnotationProcessor {
             for (MethodLevelVisitor methodLevelVisitor : methodLevelVisitors) {
                 ForceSignatureAnnotationVisitor annotationVisitor = methodLevelVisitor.annotationVisitor;
                 if (annotationVisitor == null) continue;
-                forcedMethodSignatures.put(
+                forcedMethodsMapping.put(
                     new MethodHeader(methodLevelVisitor.owner,
                         methodLevelVisitor.access,
                         methodLevelVisitor.name,
@@ -132,6 +188,9 @@ public class ForceSignatureAnnotationProcessor {
         }
     }
 
+    /**
+     * A field visitor for processing field-level annotations.
+     */
     private static class FieldLevelVisitor extends FieldVisitor {
 
         private final String owner;
@@ -160,6 +219,9 @@ public class ForceSignatureAnnotationProcessor {
         }
     }
 
+    /**
+     * A method visitor for processing method-level annotations.
+     */
     private static class MethodLevelVisitor extends MethodVisitor {
 
         private final String owner;
@@ -190,6 +252,9 @@ public class ForceSignatureAnnotationProcessor {
         }
     }
 
+    /**
+     * An annotation visitor for processing the actual {@link ForceSignature} annotation.
+     */
     private static class ForceSignatureAnnotationVisitor extends AnnotationVisitor {
 
         private String identifier;
@@ -226,6 +291,9 @@ public class ForceSignatureAnnotationProcessor {
             }
         }
 
+        /**
+         * A specialized annotation visitor for visiting the values of {@link ForceSignature#parameterTypes()}.
+         */
         private class ParameterTypesVisitor extends AnnotationVisitor {
 
             private ParameterTypesVisitor() {

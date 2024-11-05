@@ -13,21 +13,40 @@ import java.util.Map;
 
 import static org.objectweb.asm.Opcodes.*;
 
+/**
+ * A class node for recording bytecode instructions of solution classes.
+ * @author Daniel Mangold
+ */
 public class SolutionClassNode extends ClassNode {
 
     private final String className;
     private final Map<FieldHeader, FieldNode> fields = new HashMap<>();
     private final Map<MethodHeader, MethodNode> methods = new HashMap<>();
 
+    /**
+     * Constructs a new {@link SolutionClassNode} instance.
+     *
+     * @param className the name of the solution class
+     */
     public SolutionClassNode(String className) {
         super(Opcodes.ASM9);
         this.className = className;
     }
 
+    /**
+     * Returns the mapping of field headers to field nodes for this solution class.
+     *
+     * @return the field header => field node mapping
+     */
     public Map<FieldHeader, FieldNode> getFields() {
         return fields;
     }
 
+    /**
+     * Returns the mapping of method headers to method nodes for this solution class.
+     *
+     * @return the method header => method node mapping
+     */
     public Map<MethodHeader, MethodNode> getMethods() {
         return methods;
     }
@@ -52,6 +71,18 @@ public class SolutionClassNode extends ClassNode {
         return methodNode;
     }
 
+    /**
+     * Constructs a new method node with the given information.
+     * The returned method node ensures that lambda methods of the solution class don't interfere
+     * with the ones defined in the submission class.
+     *
+     * @param access     the method's modifiers
+     * @param name       the method's name
+     * @param descriptor the method's descriptor
+     * @param signature  the method's signature
+     * @param exceptions the method's declared exceptions
+     * @return a new {@link MethodNode}
+     */
     private MethodNode getMethodNode(int access, String name, String descriptor, String signature, String[] exceptions) {
         return new MethodNode(ASM9, access, name, descriptor, signature, exceptions) {
             @Override

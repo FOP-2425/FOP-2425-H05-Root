@@ -12,6 +12,47 @@ import java.util.*;
 import static h05.transform.util.TransformationUtils.*;
 import static org.objectweb.asm.Opcodes.*;
 
+/**
+ * A class visitor merging a submission class with its corresponding solution class, should one exist.
+ * The heart piece of the {@link SolutionMergingClassTransformer} processing chain.
+ * <br>
+ * Main features:
+ * <ul>
+ *     <li>
+ *         <b>Method invocation logging</b><br>
+ *         Logs the parameter values the method was called with.
+ *         This allows the user to verify that a method was called and also that it was called with
+ *         the right parameters.
+ *         If the target method is not static or a constructor, the object the method was invoked on
+ *         is logged as well.
+ *     </li>
+ *     <li>
+ *         <b>Method substitution</b><br>
+ *         Allows for "replacement" of a method at runtime.
+ *         While the method itself must still be invoked, it will hand over execution to the provided
+ *         substitution.
+ *         This can be useful when a method should always return a certain value, regardless of object state
+ *         or for making a non-deterministic method (e.g., RNG) return deterministic values.
+ *         Replacing constructors is currently not supported.
+ *         Can be combined with invocation logging.
+ *     </li>
+ *     <li>
+ *         <b>Method delegation</b><br>
+ *         Will effectively "replace" the code of the original submission with the one from the solution.
+ *         While the instructions from both submission and solution are present in the merged method, only
+ *         one can be active at a time.
+ *         This allows for improved unit testing by not relying on submission code transitively.
+ *         If this mechanism is used and no solution class is associated with this submission class or
+ *         the solution class does not contain a matching method, the submission code will be used
+ *         as a fallback.
+ *         Can be combined with invocation logging.
+ *     </li>
+ * </ul>
+ * All of these options can be enabled / disabled via {@link SubmissionExecutionHandler}.
+ *
+ * @see SubmissionExecutionHandler
+ * @author Daniel Mangold
+ */
 class SubmissionClassVisitor extends ClassVisitor {
 
     private final boolean defaultTransformationsOnly;
@@ -46,6 +87,11 @@ class SubmissionClassVisitor extends ClassVisitor {
         }
     }
 
+    /**
+     * Visits a field of the submission class and transforms it if a solution class is present.
+     *
+     * @inheritDoc
+     */
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
         if (defaultTransformationsOnly) {
@@ -57,6 +103,11 @@ class SubmissionClassVisitor extends ClassVisitor {
         return fieldHeader.toFieldVisitor(getDelegate(), value);
     }
 
+    /**
+     * Visits a method of a submission class and transforms it if a solution class is present.
+     *
+     * @inheritDoc
+     */
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodHeader methodHeader = submissionClassInfo.getComputedMethodHeader(name, descriptor);
@@ -207,6 +258,11 @@ class SubmissionClassVisitor extends ClassVisitor {
                 }
             }
 
+            /**
+             * Builds an {@link h05.transform.SubmissionExecutionHandler.Invocation} in bytecode.
+             *
+             * @param argumentTypes an array of parameter types
+             */
             private void buildInvocation(Type[] argumentTypes) {
                 super.visitTypeInsn(NEW, SubmissionExecutionHandler.Invocation.INTERNAL_NAME);
                 super.visitInsn(DUP);
@@ -231,6 +287,10 @@ class SubmissionClassVisitor extends ClassVisitor {
         };
     }
 
+    /**
+     * Adds all remaining fields and methods from the solution class that have not already
+     * been visited (e.g., lambdas).
+     */
     @Override
     public void visitEnd() {
         if (!defaultTransformationsOnly) {
