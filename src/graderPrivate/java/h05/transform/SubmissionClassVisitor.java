@@ -117,12 +117,13 @@ class SubmissionClassVisitor extends ClassVisitor {
             @Override
             public void visitCode() {
                 // if method is abstract or lambda, skip transformation
-                if ((access & ACC_ABSTRACT) != 0 || ((access & ACC_SYNTHETIC) != 0 && name.startsWith("lambda$"))) {
+                if ((methodHeader.access() & ACC_ABSTRACT) != 0 ||
+                    ((methodHeader.access() & ACC_SYNTHETIC) != 0 && methodHeader.name().startsWith("lambda$"))) {
                     super.visitCode();
                     return;
                 }
 
-                Type[] argumentTypes = Type.getArgumentTypes(descriptor);
+                Type[] argumentTypes = Type.getArgumentTypes(methodHeader.descriptor());
                 Label substitutionCheckLabel = new Label();
                 Label delegationCheckLabel = new Label();
                 Label submissionCodeLabel = new Label();
@@ -136,19 +137,19 @@ class SubmissionClassVisitor extends ClassVisitor {
                 // check if invocation should be logged
                 super.visitInsn(DUP);
                 super.visitLdcInsn(className);
-                super.visitLdcInsn(name);
-                super.visitLdcInsn(descriptor);
+                super.visitLdcInsn(methodHeader.name());
+                super.visitLdcInsn(methodHeader.descriptor());
                 super.visitMethodInsn(INVOKEVIRTUAL,
                     SubmissionExecutionHandler.INTERNAL_NAME,
                     "logInvocation",
                     "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z",
                     false);
-                super.visitJumpInsn(IFEQ, name.equals("<init>") ? delegationCheckLabel : substitutionCheckLabel); // jump to label if logInvocation(...) == false
+                super.visitJumpInsn(IFEQ, methodHeader.name().equals("<init>") ? delegationCheckLabel : substitutionCheckLabel); // jump to label if logInvocation(...) == false
                 // intercept parameters
                 super.visitInsn(DUP); // duplicate SubmissionExecutionHandler reference
                 super.visitLdcInsn(className);
-                super.visitLdcInsn(name);
-                super.visitLdcInsn(descriptor);
+                super.visitLdcInsn(methodHeader.name());
+                super.visitLdcInsn(methodHeader.descriptor());
                 buildInvocation(argumentTypes);
                 super.visitMethodInsn(INVOKEVIRTUAL,
                     SubmissionExecutionHandler.INTERNAL_NAME,
@@ -157,13 +158,13 @@ class SubmissionClassVisitor extends ClassVisitor {
                     false);
 
                 // check if substitution exists for this method if not constructor (because waaay too complex right now)
-                if (!name.equals("<init>")) {
+                if (!methodHeader.name().equals("<init>")) {
                     super.visitFrame(F_SAME1, 0, null, 1, new Object[]{SubmissionExecutionHandler.INTERNAL_NAME});
                     super.visitLabel(substitutionCheckLabel);
                     super.visitInsn(DUP);
                     super.visitLdcInsn(className);
-                    super.visitLdcInsn(name);
-                    super.visitLdcInsn(descriptor);
+                    super.visitLdcInsn(methodHeader.name());
+                    super.visitLdcInsn(methodHeader.descriptor());
                     super.visitMethodInsn(INVOKEVIRTUAL,
                         SubmissionExecutionHandler.INTERNAL_NAME,
                         "useSubstitution",
@@ -171,8 +172,8 @@ class SubmissionClassVisitor extends ClassVisitor {
                         false);
                     super.visitJumpInsn(IFEQ, delegationCheckLabel); // jump to label if useSubstitution(...) == false
                     super.visitLdcInsn(className);
-                    super.visitLdcInsn(name);
-                    super.visitLdcInsn(descriptor);
+                    super.visitLdcInsn(methodHeader.name());
+                    super.visitLdcInsn(methodHeader.descriptor());
                     super.visitMethodInsn(INVOKEVIRTUAL,
                         SubmissionExecutionHandler.INTERNAL_NAME,
                         "getSubstitution",
@@ -184,7 +185,7 @@ class SubmissionClassVisitor extends ClassVisitor {
                         "execute",
                         "(L" + SubmissionExecutionHandler.Invocation.INTERNAL_NAME + ";)Ljava/lang/Object;",
                         true);
-                    Type returnType = Type.getReturnType(descriptor);
+                    Type returnType = Type.getReturnType(methodHeader.descriptor());
                     if (returnType.getSort() == Type.ARRAY || returnType.getSort() == Type.OBJECT) {
                         super.visitTypeInsn(CHECKCAST, returnType.getInternalName());
                     } else {
@@ -201,8 +202,8 @@ class SubmissionClassVisitor extends ClassVisitor {
                     super.visitInsn(POP); // remove SubmissionExecutionHandler instance from stack
                 } else {
                     super.visitLdcInsn(className);
-                    super.visitLdcInsn(name);
-                    super.visitLdcInsn(descriptor);
+                    super.visitLdcInsn(methodHeader.name());
+                    super.visitLdcInsn(methodHeader.descriptor());
                     super.visitMethodInsn(INVOKEVIRTUAL,
                         SubmissionExecutionHandler.INTERNAL_NAME,
                         "useStudentImpl",
@@ -223,9 +224,9 @@ class SubmissionClassVisitor extends ClassVisitor {
                         default -> type.getInternalName();
                     })
                     .toArray();
-                if ((access & ACC_STATIC) == 0) { // if method is not static
+                if ((methodHeader.access() & ACC_STATIC) == 0) { // if method is not static
                     Object[] types = new Object[parameterTypes.length + 1];
-                    types[0] = name.equals("<init>") ? UNINITIALIZED_THIS : className;
+                    types[0] = methodHeader.name().equals("<init>") ? UNINITIALIZED_THIS : className;
                     System.arraycopy(parameterTypes, 0, types, 1, parameterTypes.length);
                     super.visitFrame(F_FULL, types.length, types, 0, null);
                 } else {
@@ -239,7 +240,7 @@ class SubmissionClassVisitor extends ClassVisitor {
             @Override
             public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
                 // skip transformation if only default transformations are applied or owner is not part of the submission
-                if (defaultTransformationsOnly || !owner.startsWith(transformationContext.getProjectPrefix())) {
+                if (defaultTransformationsOnly || !owner.startsWith(transformationContext.projectPrefix())) {
                     super.visitFieldInsn(opcode, owner, name, descriptor);
                 } else {
                     FieldHeader fieldHeader = transformationContext.getSubmissionClassInfo(owner).getComputedFieldHeader(name);
@@ -250,7 +251,7 @@ class SubmissionClassVisitor extends ClassVisitor {
             @Override
             public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                 // skip transformation if only default transformations are applied or owner is not part of the submission
-                if (defaultTransformationsOnly || !owner.startsWith(transformationContext.getProjectPrefix())) {
+                if (defaultTransformationsOnly || !owner.startsWith(transformationContext.projectPrefix())) {
                     super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                 } else {
                     MethodHeader methodHeader = transformationContext.getSubmissionClassInfo(owner).getComputedMethodHeader(name, descriptor);
@@ -266,7 +267,7 @@ class SubmissionClassVisitor extends ClassVisitor {
             private void buildInvocation(Type[] argumentTypes) {
                 super.visitTypeInsn(NEW, SubmissionExecutionHandler.Invocation.INTERNAL_NAME);
                 super.visitInsn(DUP);
-                if ((access & ACC_STATIC) == 0 && !name.equals("<init>")) {
+                if ((methodHeader.access() & ACC_STATIC) == 0 && !methodHeader.name().equals("<init>")) {
                     super.visitVarInsn(ALOAD, 0);
                     super.visitMethodInsn(INVOKESPECIAL, SubmissionExecutionHandler.Invocation.INTERNAL_NAME, "<init>", "(Ljava/lang/Object;)V", false);
                 } else {
@@ -275,7 +276,7 @@ class SubmissionClassVisitor extends ClassVisitor {
                 for (int i = 0; i < argumentTypes.length; i++) {
                     super.visitInsn(DUP);
                     // load parameter with opcode (ALOAD, ILOAD, etc.) for type and ignore "this", if it exists
-                    super.visitVarInsn(argumentTypes[i].getOpcode(ILOAD), getLocalsIndex(argumentTypes, i) + ((access & ACC_STATIC) == 0 ? 1 : 0));
+                    super.visitVarInsn(argumentTypes[i].getOpcode(ILOAD), getLocalsIndex(argumentTypes, i) + ((methodHeader.access() & ACC_STATIC) == 0 ? 1 : 0));
                     boxType(getDelegate(), argumentTypes[i]);
                     super.visitMethodInsn(INVOKEVIRTUAL,
                         SubmissionExecutionHandler.Invocation.INTERNAL_NAME,
