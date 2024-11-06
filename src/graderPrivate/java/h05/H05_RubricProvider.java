@@ -57,10 +57,11 @@ public class H05_RubricProvider implements RubricProvider {
 
     private static final Criterion H5_1_4 = Criterion.builder()
         .shortDescription("H5.1.4 | Wetterballon")
-        .maxPoints(1)
+        .maxPoints(2)
         .addChildCriteria(
-            criterion("Die WeatherBalloon-Klasse und ihre Methoden sind korrekt implementiert.",
-                JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testHeader")),
+            criterion("Die WeatherBalloon-Klasse ist korrekt implementiert.",
+                JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testHeader"))),
+            criterion("Die Methoden der Klasse WeatherBalloon-Klasse sind korrekt implementiert.",
                 JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testStart")),
                 JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testPop")),
                 JUnitTestRef.ofMethod(() -> WeatherBalloonTest.class.getDeclaredMethod("testGetIdentifier")))
@@ -152,15 +153,17 @@ public class H05_RubricProvider implements RubricProvider {
 
     private static final Criterion H5_3_3 = Criterion.builder()
         .shortDescription("H5.3.3 | Tanker-Flugzeug")
-        .maxPoints(2)
+        .maxPoints(3)
         .addChildCriteria(
             criterion("Der Kopf der TankerPlane-Klasse sowie das Attribut availableAmount und der Konstruktor sind korrekt implementiert.",
                 JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testClassHeader")),
                 JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testFields")),
                 JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testConstructor"))),
-            criterion("Die Methoden loadFuel, mass und refuelPlane sind korrekt implementiert.",
+            criterion("Die Methoden loadFuel und mass sind korrekt implementiert.",
                 JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testLoadFuel")),
                 JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testMass")),
+                JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testRefuelPlane"))),
+            criterion("Die Methode refuelPlane ist korrekt implementiert.",
                 JUnitTestRef.ofMethod(() -> TankerPlaneTest.class.getDeclaredMethod("testRefuelPlane")))
         )
         .build();
@@ -207,7 +210,7 @@ public class H05_RubricProvider implements RubricProvider {
     @Override
     public Rubric getRubric() {
         return Rubric.builder()
-            .title("H05 | TBA")  // TODO: replace
+            .title("H05 | FOP und Fort: Abheben im Flugzeug")
             .addChildCriteria(H5_1, H5_2, H5_3, H5_4, H5_5, H5_6)
             .build();
     }
