@@ -3,12 +3,15 @@ package h05.transform.util;
 import h05.transform.SolutionClassNode;
 import h05.transform.SolutionMergingClassTransformer;
 import h05.transform.SubmissionClassInfo;
+import h05.transform.SubmissionExecutionHandler;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -99,6 +102,48 @@ public final class TransformationUtils {
             localsIndex += (types[i].getSort() == Type.LONG || types[i].getSort() == Type.DOUBLE) ? 2 : 1;
         }
         return localsIndex;
+    }
+
+    /**
+     * Builds a method header with bytecode instructions using the given method visitor and information
+     * stored in the given method header.
+     * Upon return, a reference to the newly created {@link MethodHeader} object is located at
+     * the top of the method visitor's stack.
+     *
+     * @param mv           the method visitor to use
+     * @param methodHeader the method header to replicate in bytecode
+     */
+    public static void buildMethodHeader(MethodVisitor mv, MethodHeader methodHeader) {
+        mv.visitTypeInsn(NEW, MethodHeader.INTERNAL_TYPE.getInternalName());
+        mv.visitInsn(DUP);
+        mv.visitLdcInsn(methodHeader.owner());
+        mv.visitLdcInsn(methodHeader.access());
+        mv.visitLdcInsn(methodHeader.name());
+        mv.visitLdcInsn(methodHeader.descriptor());
+        String signature = methodHeader.signature();
+        if (signature != null) {
+            mv.visitLdcInsn(signature);
+        } else {
+            mv.visitInsn(ACONST_NULL);
+        }
+        String[] exceptions = methodHeader.exceptions();
+        if (exceptions != null) {
+            mv.visitIntInsn(SIPUSH, exceptions.length);
+            mv.visitTypeInsn(ANEWARRAY, Type.getInternalName(String.class));
+            for (int i = 0; i < exceptions.length; i++) {
+                mv.visitInsn(DUP);
+                mv.visitIntInsn(SIPUSH, i);
+                mv.visitLdcInsn(exceptions[i]);
+                mv.visitInsn(AASTORE);
+            }
+        } else {
+            mv.visitInsn(ACONST_NULL);
+        }
+        mv.visitMethodInsn(INVOKESPECIAL,
+            MethodHeader.INTERNAL_TYPE.getInternalName(),
+            "<init>",
+            MethodHeader.INTERNAL_CONSTRUCTOR_DESCRIPTOR,
+            false);
     }
 
     /**

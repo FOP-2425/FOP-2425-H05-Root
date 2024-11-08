@@ -2,7 +2,10 @@ package h05.transform.util;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -16,7 +19,32 @@ import java.util.Objects;
  * @param exceptions exceptions declared in the method's {@code throws} clause
  * @author Daniel Mangold
  */
-public record MethodHeader(String owner, Integer access, String name, String descriptor, String signature, String[] exceptions) {
+public record MethodHeader(String owner, int access, String name, String descriptor, String signature, String[] exceptions) {
+
+    public static final Type INTERNAL_TYPE = Type.getType(MethodHeader.class);
+    public static final String INTERNAL_CONSTRUCTOR_DESCRIPTOR = Type.getMethodDescriptor(Type.VOID_TYPE,
+        Type.getType(String.class),
+        Type.INT_TYPE,
+        Type.getType(String.class),
+        Type.getType(String.class),
+        Type.getType(String.class),
+        Type.getType(String[].class));
+
+    /**
+     * Constructs a new method header using the given method.
+     *
+     * @param method a java reflection method
+     */
+    public MethodHeader(Method method) {
+        this(Type.getInternalName(method.getDeclaringClass()),
+            method.getModifiers(),
+            method.getName(),
+            Type.getMethodDescriptor(method),
+            null,
+            Arrays.stream(method.getExceptionTypes())
+                .map(Type::getInternalName)
+                .toArray(String[]::new));
+    }
 
     /**
      * Visits a method in the given class visitor using the information stored in this record.
