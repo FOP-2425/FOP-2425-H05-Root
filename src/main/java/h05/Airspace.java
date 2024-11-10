@@ -1,5 +1,6 @@
 package h05;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,10 @@ public class Airspace {
 
     private Airspace(){
 
+    }
+
+    Set<Flying> getFlyingInAirspace() {
+        return Collections.unmodifiableSet(flyingInAirspace);
     }
 
     void register(Flying flying){

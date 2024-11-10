@@ -1,0 +1,18 @@
+[
+  {
+    "enumConstantName": "JetA",
+    "enumConstantValue": 1.0
+  },
+  {
+    "enumConstantName": "JetB",
+    "enumConstantValue": 1.2
+  },
+  {
+    "enumConstantName": "AvGas",
+    "enumConstantValue": 0.99
+  },
+  {
+    "enumConstantName": "Biokerosin",
+    "enumConstantValue": 1.02
+  }
+]

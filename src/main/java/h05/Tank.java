@@ -9,13 +9,13 @@ public class Tank implements Refuelling{
     }
 
     @Override
-    public void refuel(Plane plane) {
+    public void refuelPlane(Plane plane) {
         if(plane.getFuelType() != fuelType){
+            System.out.println("Incompatible fuel types, not refuelling");
             return;
         }
 
         double missingFuel = plane.getFuelCapacity() - plane.getCurrentFuelLevel();
         plane.refuel(missingFuel);
-
     }
 }

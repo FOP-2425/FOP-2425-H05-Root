@@ -29,7 +29,7 @@ public class Main {
         tankerPlane.loadFuel(FuelType.Biokerosin, 100000);
 
         PassengerPlane passengerPlane = new PassengerPlane("GAG-67", 10000, FuelType.JetA, 1700, 5);
-        jetATank.refuel(passengerPlane);
+        jetATank.refuelPlane(passengerPlane);
         passengerPlane.board(100);
         passengerPlane.takeOff();
 
@@ -37,7 +37,7 @@ public class Main {
 
         CargoPlane cargoPlane = new CargoPlane("D-AFFF", 8000, FuelType.JetB, 1500);
         cargoPlane.loadContainer(1000);
-        jetBTank.refuel(cargoPlane);
+        jetBTank.refuelPlane(cargoPlane);
 
         passengerPlane.disembark();
 
@@ -49,7 +49,7 @@ public class Main {
         airspace.scanAirspace();
 
         CombinedPlane combinedPlane = new CombinedPlane("D-ABBB", 9000, FuelType.AvGas, 10700, 5);
-        tankerPlane.refuel(combinedPlane);
+        tankerPlane.refuelPlane(combinedPlane);
 
         combinedPlane.board(30);
         combinedPlane.loadContainer(400);

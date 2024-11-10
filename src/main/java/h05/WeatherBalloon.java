@@ -18,6 +18,6 @@ public class WeatherBalloon implements Flying{
 
     @Override
     public String getIdentifier() {
-        return "WeatherBalloon-" + balloonNumber;
+        return "WeatherBalloon " + balloonNumber;
     }
 }
