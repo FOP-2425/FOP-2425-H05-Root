@@ -11,9 +11,9 @@ jagr {
     assignmentId.set("h05")
     submissions {
         val main by creating {
-            // studentId.set("")
-            // firstName.set("")
-            // lastName.set("")
+             studentId.set("")
+             firstName.set("")
+             lastName.set("")
         }
     }
     graders {
@@ -22,7 +22,6 @@ jagr {
             rubricProviderName.set("h05.H05_RubricProvider")
             configureDependencies {
                 implementation(libs.algoutils.tutor)
-                implementation(libs.asm.tree)
             }
         }
     }
@@ -55,7 +54,7 @@ tasks {
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
 }
