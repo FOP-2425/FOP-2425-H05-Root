@@ -1,29 +1,33 @@
 package h05;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
+import org.tudalgo.algoutils.transform.util.headers.ClassHeader;
+import org.tudalgo.algoutils.transform.util.headers.MethodHeader;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
-import org.tudalgo.algoutils.tutor.general.match.Matcher;
-import org.tudalgo.algoutils.tutor.general.reflections.TypeLink;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
-import static h05.Links.AIRSPACE_DEREGISTER_LINK;
+import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
 @TestForSubmission
 public class WeatherBalloonTest {
 
+    @AfterEach
+    public void tearDown() {
+        resetAll();
+    }
+
     @Test
     public void testHeader() {
-        TypeLink weatherBalloonLink = Links.WEATHER_BALLOON_LINK.get();
+        ClassHeader originalClassHeader = getOriginalClassHeader(WeatherBalloon.class);
 
-        assertTrue((weatherBalloonLink.modifiers() & Modifier.PUBLIC) != 0, emptyContext(), result ->
+        assertTrue(Modifier.isPublic(originalClassHeader.modifiers()), emptyContext(), result ->
             "WeatherBalloon is not public");
-        assertNotNull(weatherBalloonLink.getInterface(Matcher.of(Links.FLYING_LINK.get()::equals)), emptyContext(), result ->
+        assertTrue(originalClassHeader.getInterfaceTypes().contains(Flying.class), emptyContext(), result ->
             "WeatherBalloon does not implement interface Flying");
     }
 
@@ -31,11 +35,12 @@ public class WeatherBalloonTest {
     public void testStart() {
         Airspace airspace = Airspace.get();
         Set.copyOf(airspace.getFlyingInAirspace())
-            .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
-                "An exception occurred while invoking deregister(Flying)"));
-        Object weatherBalloonInstance = Mockito.mock(Links.WEATHER_BALLOON_LINK.get().reflection(), Mockito.CALLS_REAL_METHODS);
+            .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
+                "An exception occurred while invoking 'Airspace.deregister(Flying)'"));
+        WeatherBalloon weatherBalloonInstance = new WeatherBalloon(0);
 
-        call(() -> Links.WEATHER_BALLOON_START_LINK.get().invoke(weatherBalloonInstance), emptyContext(), result ->
+        Delegation.disable(MethodHeader.of(WeatherBalloon.class, "start"));
+        call(weatherBalloonInstance::start, emptyContext(), result ->
             "An exception occurred while invoking method start");
         Set<?> flyingInAirspace = airspace.getFlyingInAirspace();
         assertEquals(1, flyingInAirspace.size(), emptyContext(), result ->
@@ -45,18 +50,17 @@ public class WeatherBalloonTest {
     }
 
     @Test
-    public void testPop() throws ReflectiveOperationException {
+    public void testPop() {
         Airspace airspace = Airspace.get();
         Set.copyOf(airspace.getFlyingInAirspace())
-            .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
-                "An exception occurred while invoking deregister(Flying)"));
-        Object weatherBalloonInstance = Mockito.mock(Links.WEATHER_BALLOON_LINK.get().reflection(), Mockito.CALLS_REAL_METHODS);
-        Field flyingInAirspaceField = Airspace.class.getDeclaredField("flyingInAirspace");
-        flyingInAirspaceField.trySetAccessible();
-        Set<Object> set = (Set<Object>) flyingInAirspaceField.get(airspace);
-        set.add(weatherBalloonInstance);
+            .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
+                "An exception occurred while invoking 'Airspace.deregister(Flying)'"));
 
-        call(() -> Links.WEATHER_BALLOON_POP_LINK.get().invoke(weatherBalloonInstance), emptyContext(), result ->
+        WeatherBalloon weatherBalloonInstance = new WeatherBalloon(0);
+        weatherBalloonInstance.start();
+
+        Delegation.disable(MethodHeader.of(WeatherBalloon.class, "pop"));
+        call(weatherBalloonInstance::pop, emptyContext(), result ->
             "An exception occurred while invoking method pop");
         Set<?> flyingInAirspace = airspace.getFlyingInAirspace();
         assertEquals(0, flyingInAirspace.size(), emptyContext(), result ->
@@ -64,21 +68,16 @@ public class WeatherBalloonTest {
     }
 
     @Test
-    public void testGetIdentifier() throws Throwable {
+    public void testGetIdentifier() {
         int balloonNumber = 12345;
         Context context = contextBuilder()
             .add("balloonNumber", balloonNumber)
             .build();
-        Object weatherBalloonInstance = callObject(() -> Links.WEATHER_BALLOON_CONSTRUCTOR_LINK.get().invoke(balloonNumber),
-            context,
-            result -> "An exception occurred while invoking constructor of WeatherBalloon");
+        WeatherBalloon weatherBalloonInstance = new WeatherBalloon(balloonNumber);
 
         // TODO: Implementation and exercise sheet differ
-        assertCallEquals(
-            "WeatherBalloon " + balloonNumber,
-            () -> Links.WEATHER_BALLOON_GET_IDENTIFIER_LINK.get().invoke(weatherBalloonInstance),
-            context,
-            result -> "Identifier returned by getIdentifier is incorrect"
-        );
+        Delegation.disable(MethodHeader.of(WeatherBalloon.class, "getIdentifier"));
+        assertCallEquals("WeatherBalloon " + balloonNumber, weatherBalloonInstance::getIdentifier, context,
+            result -> "Identifier returned by getIdentifier is incorrect");
     }
 }
