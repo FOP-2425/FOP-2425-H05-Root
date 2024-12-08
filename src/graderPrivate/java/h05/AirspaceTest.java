@@ -1,19 +1,25 @@
 package h05;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
+import org.tudalgo.algoutils.transform.util.headers.MethodHeader;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Set;
 
-import static h05.Links.*;
+import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
 @TestForSubmission
 public class AirspaceTest {
+
+    @AfterEach
+    public void tearDown() {
+        resetAll();
+    }
 
     @Test
     public void testScanAirspace_Empty() {
@@ -24,11 +30,13 @@ public class AirspaceTest {
         try {
             Airspace airspace = Airspace.get();
             Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
                     "An exception occurred while invoking deregister(Flying)"));
+
+            Delegation.disable(MethodHeader.of(Airspace.class, "scanAirspace"));
             call(airspace::scanAirspace, emptyContext(), result -> "An exception occurred while invoking scanAirspace()");
-            assertEquals("Scanning...\nAirspace is empty", outputStream.toString().strip(), emptyContext(), result ->
-                "scanAirspace() printed to wrong message to System.out");
+            assertEquals("Scanning...\nAirspace is empty", outputStream.toString().strip(), emptyContext(),
+                result -> "scanAirspace() printed to wrong message to System.out");
         } finally {
             System.setOut(oldOut);
         }
@@ -42,21 +50,17 @@ public class AirspaceTest {
 
         try {
             String aircraftRegistration = "D-FLOP";
-            Object cargoPlaneInstance = Mockito.mock(CARGO_PLANE_LINK.get().reflection(), invocation -> {
-                if (invocation.getMethod().equals(PLANE_GET_IDENTIFIER_LINK.get().reflection())) {
-                    return aircraftRegistration;
-                } else {
-                    return Mockito.RETURNS_DEFAULTS.answer(invocation);
-                }
-            });
+            CargoPlane cargoPlaneInstance = new CargoPlane(aircraftRegistration, 0, FuelType.JetA, 1000);
             Context context = contextBuilder()
                 .add("plane in airspace", cargoPlaneInstance)
                 .build();
             Airspace airspace = Airspace.get();
             Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
                     "An exception occurred while invoking deregister(Flying)"));
-            call(() -> AIRSPACE_REGISTER_LINK.get().invoke(airspace, cargoPlaneInstance), context, result ->
+
+            Delegation.disable(MethodHeader.of(Airspace.class, "register", Flying.class));
+            call(() -> airspace.register(cargoPlaneInstance), context, result ->
                 "An exception occurred while invoking register(Flying)");
             call(airspace::scanAirspace, emptyContext(), result -> "An exception occurred while invoking scanAirspace()");
             assertEquals("Scanning...\n%s is flying in airspace".formatted(aircraftRegistration),
@@ -77,23 +81,18 @@ public class AirspaceTest {
         try {
             String aircraftRegistration = "D-FLOP";
             int passengerCount = 100;
-            Object passengerPlaneInstance = Mockito.mock(PASSENGER_PLANE_LINK.get().reflection(), invocation -> {
-                if (invocation.getMethod().equals(PLANE_GET_IDENTIFIER_LINK.get().reflection())) {
-                    return aircraftRegistration;
-                } else if (invocation.getMethod().equals(PASSENGER_PLANE_GET_PASSENGER_COUNT_LINK.get().reflection())) {
-                    return passengerCount;
-                } else {
-                    return Mockito.RETURNS_DEFAULTS.answer(invocation);
-                }
-            });
+            PassengerPlane passengerPlaneInstance = new PassengerPlane(aircraftRegistration, 0, FuelType.JetA, 1000, 5);
+            passengerPlaneInstance.board(passengerCount);
             Context context = contextBuilder()
                 .add("plane in airspace", passengerPlaneInstance)
                 .build();
             Airspace airspace = Airspace.get();
             Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
+                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
                     "An exception occurred while invoking deregister(Flying)"));
-            call(() -> AIRSPACE_REGISTER_LINK.get().invoke(airspace, passengerPlaneInstance), context, result ->
+
+            Delegation.disable(MethodHeader.of(Airspace.class, "register", Flying.class));
+            call(() -> airspace.register(passengerPlaneInstance), context, result ->
                 "An exception occurred while invoking register(Flying)");
             call(airspace::scanAirspace, emptyContext(), result -> "An exception occurred while invoking scanAirspace()");
             assertEquals("Scanning...\n%s is flying in airspace (%d PAX)".formatted(aircraftRegistration, passengerCount),
