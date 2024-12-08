@@ -1,8 +1,9 @@
 package h05;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
+import org.tudalgo.algoutils.transform.util.headers.MethodHeader;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSetTest;
@@ -13,16 +14,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static h05.Links.AIRSPACE_DEREGISTER_LINK;
+import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
 @TestForSubmission
 public class MainTest {
 
-    private static List<Set<String>> airspaceScans;
+    private List<Set<String>> airspaceScans;
 
-    @BeforeAll
-    public static void setup() {
+    @AfterEach
+    public void tearDown() {
+        resetAll();
+    }
+
+    public void setupEnvironment() {
         PrintStream oldOut = System.out;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
@@ -30,8 +35,10 @@ public class MainTest {
         try {
             Airspace airspace = Airspace.get();
             Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> AIRSPACE_DEREGISTER_LINK.get().invoke(airspace, flying), emptyContext(), result ->
-                    "An exception occurred while invoking deregister(Flying)"));
+                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
+                    "An exception occurred while invoking Airspace.deregister(Flying)"));
+
+            Delegation.disable(MethodHeader.of(Main.class, "main", String[].class));
             call(() -> Main.main(new String[0]), emptyContext(), result -> "An exception occurred while invoking main method");
         } finally {
             System.setOut(oldOut);
@@ -44,6 +51,7 @@ public class MainTest {
     @ParameterizedTest
     @JsonParameterSetTest("MainTest_Airspace.json")
     public void testMain_FirstScans(JsonParameterSet params) {
+        setupEnvironment();
         if (params.getInt("invocation") <= 2) {
             testMain(params);
         }
@@ -52,6 +60,7 @@ public class MainTest {
     @ParameterizedTest
     @JsonParameterSetTest("MainTest_Airspace.json")
     public void testMain_AllScans(JsonParameterSet params) {
+        setupEnvironment();
         testMain(params);
     }
 
