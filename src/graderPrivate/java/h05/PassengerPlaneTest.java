@@ -8,7 +8,6 @@ import org.tudalgo.algoutils.transform.util.headers.FieldHeader;
 import org.tudalgo.algoutils.transform.util.headers.MethodHeader;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
@@ -60,7 +59,7 @@ public class PassengerPlaneTest {
     }
 
     @Test
-    public void testConstructor() throws ReflectiveOperationException {
+    public void testConstructor() {
         String aircraftRegistration = "D-DFOP";
         int baseWeight = 100;
         FuelType fuelType = FuelType.JetA;
@@ -81,26 +80,31 @@ public class PassengerPlaneTest {
             context,
             result -> "An exception occurred while invoking constructor of PassengerPlane");
 
-        Field aircraftRegistrationField = Plane.class.getDeclaredField("aircraftRegistration");
-        Field baseWeightField = Plane.class.getDeclaredField("baseWeight");
-        Field fuelTypeField = Plane.class.getDeclaredField("fuelType");
-        Field fuelCapacityField = Plane.class.getDeclaredField("fuelCapacity");
-        Field crewCountField = PassengerPlane.class.getDeclaredField("crewCount");
-        assertEquals(aircraftRegistration, aircraftRegistrationField.get(passengerPlaneInstance), context, result ->
-            "Field aircraftRegistration (in class Plane) has incorrect value");
-        assertEquals(baseWeight, baseWeightField.get(passengerPlaneInstance), context, result ->
-            "Field baseWeight (in class Plane) has incorrect value");
-        assertEquals(fuelType, fuelTypeField.get(passengerPlaneInstance), context, result ->
-            "Field fuelType (in class Plane) has incorrect value");
-        assertEquals(fuelCapacity, fuelCapacityField.get(passengerPlaneInstance), context, result ->
-            "Field fuelCapacity (in class Plane) has incorrect value");
-        assertEquals(crewCount, crewCountField.get(passengerPlaneInstance), context, result ->
-            "Field crewCount has incorrect value");
+        assertEquals(aircraftRegistration,
+            FieldHeader.of(Plane.class, "aircraftRegistration").getValue(passengerPlaneInstance),
+            context,
+            result -> "Field aircraftRegistration (in class Plane) has incorrect value");
+        assertEquals(baseWeight,
+            FieldHeader.of(Plane.class, "baseWeight").getValue(passengerPlaneInstance),
+            context,
+            result -> "Field baseWeight (in class Plane) has incorrect value");
+        assertEquals(fuelType,
+            FieldHeader.of(Plane.class, "fuelType").getValue(passengerPlaneInstance),
+            context,
+            result -> "Field fuelType (in class Plane) has incorrect value");
+        assertEquals(fuelCapacity,
+            FieldHeader.of(Plane.class, "fuelCapacity").getValue(passengerPlaneInstance),
+            context,
+            result -> "Field fuelCapacity (in class Plane) has incorrect value");
+        assertEquals(crewCount,
+            FieldHeader.of(PassengerPlane.class, "crewCount").getValue(passengerPlaneInstance),
+            context,
+            result -> "Field crewCount has incorrect value");
     }
 
     @Test
-    public void testBoard() throws ReflectiveOperationException {
-        Field passengerCountField = PassengerPlane.class.getDeclaredField("passengerCount");
+    public void testBoard() {
+        FieldHeader passengerCountField = FieldHeader.of(PassengerPlane.class, "passengerCount");
         MethodHeader board = MethodHeader.of(PassengerPlane.class, "board", int.class);
         PassengerPlane passengerPlaneInstance = new PassengerPlane("D-ABCD", 0, FuelType.JetA, 1000, 2);
 
@@ -114,38 +118,38 @@ public class PassengerPlaneTest {
             final int finalI = i;
             call(() -> passengerPlaneInstance.board(finalI), context, result ->
                 "An exception occurred while invoking board(int)");
-            assertEquals(totalPassengersExpected, passengerCountField.get(passengerPlaneInstance), context,
+            assertEquals(totalPassengersExpected, passengerCountField.getValue(passengerPlaneInstance), context,
                 result -> "board(int) did not add the given amount to field passengerCount");
         }
     }
 
     @Test
-    public void testDisembark() throws ReflectiveOperationException {
-        Field passengerCountField = PassengerPlane.class.getDeclaredField("passengerCount");
+    public void testDisembark() {
+        FieldHeader passengerCountField = FieldHeader.of(PassengerPlane.class, "passengerCount");
         MethodHeader disembark = MethodHeader.of(PassengerPlane.class, "disembark");
         PassengerPlane passengerPlaneInstance = new PassengerPlane("D-ABCD", 0, FuelType.JetA, 1000, 2);
 
         Delegation.disable(disembark);
         for (int i = 0; i < 10; i++) {
-            passengerCountField.set(passengerPlaneInstance, i);
+            passengerCountField.setValue(passengerPlaneInstance, i);
             Context context = contextBuilder()
                 .add("passengerCount (before call)", i)
                 .build();
             call(passengerPlaneInstance::disembark, context, result ->
                 "An exception occurred while invoking disembark()");
-            assertEquals(0, passengerCountField.get(passengerPlaneInstance), context, result ->
+            assertEquals(0, passengerCountField.getValue(passengerPlaneInstance), context, result ->
                 "disembark() did not set field passengerCount to 0");
         }
     }
 
     @Test
-    public void testGetPassengerCount() throws ReflectiveOperationException {
-        Field passengerCountField = PassengerPlane.class.getDeclaredField("passengerCount");
-        MethodHeader getPassengerCount = MethodHeader.of(PassengerPlane.class, "getPassengerCount");
+    public void testGetPassengerCount() {
+        FieldHeader passengerCountField = FieldHeader.of(PassengerPlane.class, "passengerCount");
         PassengerPlane passengerPlaneInstance = new PassengerPlane("D-ABCD", 0, FuelType.JetA, 1000, 2);
 
+        Delegation.disable(MethodHeader.of(PassengerPlane.class, "getPassengerCount"));
         for (int i = 0; i < 10; i++) {
-            passengerCountField.set(passengerPlaneInstance, i);
+            passengerCountField.setValue(passengerPlaneInstance, i);
             Context context = contextBuilder()
                 .add("passengerCount", i)
                 .build();

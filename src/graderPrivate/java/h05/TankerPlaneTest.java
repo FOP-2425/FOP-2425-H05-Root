@@ -9,10 +9,10 @@ import org.tudalgo.algoutils.transform.util.headers.FieldHeader;
 import org.tudalgo.algoutils.transform.util.headers.MethodHeader;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
+import static h05.TestUtils.assertDoubleEquals;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertEquals;
@@ -35,7 +35,7 @@ public class TankerPlaneTest {
     }
 
     @Test
-    public void testFields() throws ReflectiveOperationException {
+    public void testFields() {
         FieldHeader availableAmount = getOriginalFieldHeader(TankerPlane.class, "availableAmount");
         assertTrue(Modifier.isPrivate(availableAmount.modifiers()), emptyContext(), result ->
             "Field 'availableAmount' was not declared private");
@@ -60,15 +60,14 @@ public class TankerPlaneTest {
             () -> new TankerPlane(aircraftRegistration, baseWeight, fuelType, fuelCapacity),
             context,
             result -> "An exception occurred while invoking constructor of TankerPlane");
-        Field availableAmountField = TankerPlane.class.getDeclaredField("availableAmount");
-        double[] availableAmountValue = (double[]) availableAmountField.get(tankerPlaneInstance);
+        double[] availableAmountValue = FieldHeader.of(TankerPlane.class, "availableAmount").getValue(tankerPlaneInstance);
         assertNotNull(availableAmount, context, result -> "Field 'availableAmount' is null");
         assertEquals(FuelType.values().length, availableAmountValue.length, context,
             result -> "Field 'availableAmount' does not have correct length");
     }
 
     @Test
-    public void testConstructor() throws ReflectiveOperationException {
+    public void testConstructor() {
         String aircraftRegistration = "D-FLOP";
         int baseWeight = 500;
         FuelType fuelType = FuelType.JetB;
@@ -86,27 +85,30 @@ public class TankerPlaneTest {
             context,
             result -> "An exception occurred while invoking constructor of TankerPlane");
 
-        Field aircraftRegistrationField = Plane.class.getDeclaredField("aircraftRegistration");
-        Field baseWeightField = Plane.class.getDeclaredField("baseWeight");
-        Field fuelTypeField = Plane.class.getDeclaredField("fuelType");
-        Field fuelCapacityField = Plane.class.getDeclaredField("fuelCapacity");
-        assertEquals(aircraftRegistration, aircraftRegistrationField.get(tankerPlaneInstance), context, result ->
-            "Field aircraftRegistration has incorrect value");
-        assertEquals(baseWeight, baseWeightField.get(tankerPlaneInstance), context, result ->
-            "Field baseWeight has incorrect value");
-        assertEquals(fuelType, fuelTypeField.get(tankerPlaneInstance), context, result ->
-            "Field fuelType has incorrect value");
-        assertEquals(fuelCapacity, fuelCapacityField.get(tankerPlaneInstance), context, result ->
-            "Field fuelCapacity has incorrect value");
+        assertEquals(aircraftRegistration,
+            FieldHeader.of(Plane.class, "aircraftRegistration").getValue(tankerPlaneInstance),
+            context,
+            result -> "Field aircraftRegistration has incorrect value");
+        assertEquals(baseWeight,
+            FieldHeader.of(Plane.class, "baseWeight").getValue(tankerPlaneInstance),
+            context,
+            result -> "Field baseWeight has incorrect value");
+        assertEquals(fuelType,
+            FieldHeader.of(Plane.class, "fuelType").getValue(tankerPlaneInstance),
+            context,
+            result -> "Field fuelType has incorrect value");
+        assertEquals(fuelCapacity,
+            FieldHeader.of(Plane.class, "fuelCapacity").getValue(tankerPlaneInstance),
+            context,
+            result -> "Field fuelCapacity has incorrect value");
     }
 
     @Test
-    public void testLoadFuel() throws ReflectiveOperationException {
+    public void testLoadFuel() {
         double[] availableAmount = new double[FuelType.values().length];
         Arrays.fill(availableAmount, 42);
         TankerPlane tankerPlaneInstance = new TankerPlane("D-ABCD", 0, FuelType.JetA, 1000);
-        Field availableAmountField = TankerPlane.class.getDeclaredField("availableAmount");
-        availableAmountField.set(tankerPlaneInstance, availableAmount);
+        FieldHeader.of(TankerPlane.class, "availableAmount").setValue(tankerPlaneInstance, availableAmount);
 
         Delegation.disable(MethodHeader.of(TankerPlane.class, "loadFuel", FuelType.class, double.class));
         for (FuelType fuelType : FuelType.values()) {
@@ -119,13 +121,13 @@ public class TankerPlaneTest {
 
             call(() -> tankerPlaneInstance.loadFuel(fuelType, amount), context, result ->
                 "An exception occurred while invoking loadFuel(FuelType, double): " + result.cause());
-            assertEquals((double) 1337, availableAmount[fuelType.ordinal()], context, result ->
+            assertDoubleEquals(1337, availableAmount[fuelType.ordinal()], context, result ->
                 "loadFuel(FuelType, double) did not update the fuel amount for fuel type" + fuelType);
         }
     }
 
     @Test
-    public void testMass() throws ReflectiveOperationException {
+    public void testMass() {
         String aircraftRegistration = "D-FLOP";
         int baseWeight = 500;
         FuelType fuelType = FuelType.JetA;
@@ -137,7 +139,7 @@ public class TankerPlaneTest {
         for (int i = 0; i < availableAmount.length; i++) {
             totalFuelAmount += availableAmount[i] = (i + 1) * 100;
         }
-        TankerPlane.class.getDeclaredField("availableAmount").set(tankerPlaneInstance, availableAmount);
+        FieldHeader.of(TankerPlane.class, "availableAmount").setValue(tankerPlaneInstance, availableAmount);
         Context context = contextBuilder()
             .add("baseWeight", baseWeight)
             .add("availableAmount", availableAmount)
@@ -146,7 +148,7 @@ public class TankerPlaneTest {
         Delegation.disable(MethodHeader.of(TankerPlane.class, "mass"));
         double returnValue = callObject(tankerPlaneInstance::mass, context, result ->
             "An exception occurred while invoking mass()");
-        assertEquals(baseWeight + totalFuelAmount, returnValue, context, result ->
+        assertDoubleEquals(baseWeight + totalFuelAmount, returnValue, context, result ->
             "mass() did not return the correct value");
     }
 
@@ -167,25 +169,21 @@ public class TankerPlaneTest {
             }
 
             @Override
-            public double getCurrentFuelLevel() {
-                return initialFuelLevel;
-            }
-
-            @Override
             public void refuel(double amount) {
                 refuelAmount.set(amount);
             }
         };
+        FieldHeader.of(Plane.class, "currentFuelLevel").setValue(planeInstance, initialFuelLevel);
         Context context = contextBuilder()
-            .add("plane.getFuelType()", fuelType)
-            .add("plane.getFuelCapacity()", fuelCapacity)
-            .add("plane.getCurrentFuelLevel()", initialFuelLevel)
+            .add("plane.fuelType", fuelType)
+            .add("plane.fuelCapacity", fuelCapacity)
+            .add("plane.currentFuelLevel", initialFuelLevel)
             .build();
 
         Delegation.disable(MethodHeader.of(TankerPlane.class, "refuelPlane", Plane.class));
         call(() -> tankerPlaneInstance.refuelPlane(planeInstance), context, result ->
             "An exception occurred while invoking refuelPlane(Plane)");
-        assertEquals(fuelCapacity - initialFuelLevel, refuelAmount.get(), context, result ->
+        assertDoubleEquals(fuelCapacity - initialFuelLevel, refuelAmount.get(), context, result ->
             "refuelPlane(Plane) did not pass the correct value to plane.refuel(double)");
     }
 }

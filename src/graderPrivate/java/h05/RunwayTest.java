@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static h05.TestUtils.assertStringEquals;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
@@ -82,14 +83,14 @@ public class RunwayTest {
                 "An exception occurred while invoking land(Plane)");
             if (canLand) {
                 assertTrue(calledLand.get(), context, result -> "Method did not call land(Plane) but was supposed to");
-                assertEquals("Plane %s has landed successfully.".formatted(aircraftRegistration),
-                    outputStream.toString().strip(),
+                assertStringEquals("Plane %s has landed successfully.".formatted(aircraftRegistration),
+                    outputStream.toString(),
                     context,
                     result -> "Method printed wrong message to System.out");
             } else {
                 assertFalse(calledLand.get(), context, result -> "Method called land(Plane) when it was not supposed to");
-                assertEquals("Plane %s could not land. The runway is too short.".formatted(aircraftRegistration),
-                    outputStream.toString().strip(),
+                assertStringEquals("Plane %s could not land. The runway is too short.".formatted(aircraftRegistration),
+                    outputStream.toString(),
                     context,
                     result -> "Method printed wrong message to System.out");
             }

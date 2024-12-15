@@ -33,17 +33,14 @@ public class MainTest {
         System.setOut(new PrintStream(outputStream));
 
         try {
-            Airspace airspace = Airspace.get();
-            Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                    "An exception occurred while invoking Airspace.deregister(Flying)"));
+            TestUtils.clearAirspace();
 
             Delegation.disable(MethodHeader.of(Main.class, "main", String[].class));
             call(() -> Main.main(new String[0]), emptyContext(), result -> "An exception occurred while invoking main method");
         } finally {
             System.setOut(oldOut);
         }
-        airspaceScans = Arrays.stream(outputStream.toString().strip().split("Scanning\\.\\.\\.\n"))
+        airspaceScans = Arrays.stream(outputStream.toString().strip().split("Scanning\\.*\n"))
             .map(s -> Set.of(s.split("\n")))
             .toList();
     }
@@ -71,8 +68,10 @@ public class MainTest {
 
         for (String airspaceMessage : expectedAirspaceState) {
             Context context = contextBuilder().add("expected message", airspaceMessage).build();
-            assertTrue(actualAirspaceState.contains(airspaceMessage), context, result ->
-                "Airspace does not contain aircraft %s or message is incorrect".formatted(airspaceMessage.split(" is ", 2)[0]));
+            assertTrue(actualAirspaceState.stream().anyMatch(s -> TestUtils.stringEquals(airspaceMessage, s)),
+                context,
+                result -> "Airspace does not contain aircraft %s or message is incorrect"
+                    .formatted(airspaceMessage.split(" is ", 2)[0]));
         }
     }
 }

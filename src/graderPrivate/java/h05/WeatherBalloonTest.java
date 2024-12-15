@@ -10,6 +10,7 @@ import org.tudalgo.algoutils.tutor.general.assertions.Context;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
+import static h05.TestUtils.assertStringEquals;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
@@ -34,15 +35,13 @@ public class WeatherBalloonTest {
     @Test
     public void testStart() {
         Airspace airspace = Airspace.get();
-        Set.copyOf(airspace.getFlyingInAirspace())
-            .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                "An exception occurred while invoking 'Airspace.deregister(Flying)'"));
+        TestUtils.clearAirspace();
         WeatherBalloon weatherBalloonInstance = new WeatherBalloon(0);
 
         Delegation.disable(MethodHeader.of(WeatherBalloon.class, "start"));
         call(weatherBalloonInstance::start, emptyContext(), result ->
             "An exception occurred while invoking method start");
-        Set<?> flyingInAirspace = airspace.getFlyingInAirspace();
+        Set<Flying> flyingInAirspace = airspace.getFlyingInAirspace();
         assertEquals(1, flyingInAirspace.size(), emptyContext(), result ->
             "Number of aircraft in airspace differs from expected value");
         assertSame(weatherBalloonInstance, flyingInAirspace.iterator().next(), emptyContext(), result ->
@@ -52,9 +51,7 @@ public class WeatherBalloonTest {
     @Test
     public void testPop() {
         Airspace airspace = Airspace.get();
-        Set.copyOf(airspace.getFlyingInAirspace())
-            .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                "An exception occurred while invoking 'Airspace.deregister(Flying)'"));
+        TestUtils.clearAirspace();
 
         WeatherBalloon weatherBalloonInstance = new WeatherBalloon(0);
         weatherBalloonInstance.start();
@@ -77,7 +74,7 @@ public class WeatherBalloonTest {
 
         // TODO: Implementation and exercise sheet differ
         Delegation.disable(MethodHeader.of(WeatherBalloon.class, "getIdentifier"));
-        assertCallEquals("WeatherBalloon " + balloonNumber, weatherBalloonInstance::getIdentifier, context,
+        assertStringEquals("WeatherBalloon " + balloonNumber, weatherBalloonInstance.getIdentifier(), context,
             result -> "Identifier returned by getIdentifier is incorrect");
     }
 }

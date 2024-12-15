@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
 import org.tudalgo.algoutils.transform.util.headers.ClassHeader;
+import org.tudalgo.algoutils.transform.util.headers.FieldHeader;
 import org.tudalgo.algoutils.transform.util.headers.MethodHeader;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static h05.TestUtils.assertDoubleEquals;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertEquals;
@@ -32,7 +34,7 @@ public class CargoPlaneTest {
     }
 
     @Test
-    public void testConstructor() throws ReflectiveOperationException {
+    public void testConstructor() {
         String aircraftRegistration = "D-DFOP";
         int baseWeight = 100;
         FuelType fuelType = FuelType.JetA;
@@ -44,25 +46,28 @@ public class CargoPlaneTest {
             .add("fuelCapacity", fuelCapacity)
             .build();
 
-        MethodHeader constructor = MethodHeader.of(CargoPlane.class, String.class, int.class, FuelType.class, double.class);
-        Delegation.disable(constructor);
+        Delegation.disable(MethodHeader.of(CargoPlane.class, String.class, int.class, FuelType.class, double.class));
         CargoPlane cargoPlaneInstance = callObject(
             () -> new CargoPlane(aircraftRegistration, baseWeight, fuelType, fuelCapacity),
             context,
             result -> "An exception occurred while invoking constructor of CargoPlane");
 
-        Field aircraftRegistrationField = Plane.class.getDeclaredField("aircraftRegistration");
-        Field baseWeightField = Plane.class.getDeclaredField("baseWeight");
-        Field fuelTypeField = Plane.class.getDeclaredField("fuelType");
-        Field fuelCapacityField = Plane.class.getDeclaredField("fuelCapacity");
-        assertEquals(aircraftRegistration, aircraftRegistrationField.get(cargoPlaneInstance), context, result ->
-            "Field aircraftRegistration has incorrect value");
-        assertEquals(baseWeight, baseWeightField.get(cargoPlaneInstance), context, result ->
-            "Field baseWeight has incorrect value");
-        assertEquals(fuelType, fuelTypeField.get(cargoPlaneInstance), context, result ->
-            "Field fuelType has incorrect value");
-        assertEquals(fuelCapacity, fuelCapacityField.get(cargoPlaneInstance), context, result ->
-            "Field fuelCapacity has incorrect value");
+        assertEquals(aircraftRegistration,
+            FieldHeader.of(Plane.class, "aircraftRegistration").getValue(cargoPlaneInstance),
+            context,
+            result -> "Field aircraftRegistration has incorrect value");
+        assertEquals(baseWeight,
+            FieldHeader.of(Plane.class, "baseWeight").getValue(cargoPlaneInstance),
+            context,
+            result -> "Field baseWeight has incorrect value");
+        assertEquals(fuelType,
+            FieldHeader.of(Plane.class, "fuelType").getValue(cargoPlaneInstance),
+            context,
+            result -> "Field fuelType has incorrect value");
+        assertDoubleEquals(fuelCapacity,
+            FieldHeader.of(Plane.class, "fuelCapacity").getValue(cargoPlaneInstance),
+            context,
+            result -> "Field fuelCapacity has incorrect value");
     }
 
     @Test
@@ -79,8 +84,8 @@ public class CargoPlaneTest {
             .build();
 
         double returnValue = callObject(cargoPlaneInstance::mass, context, result ->
-            "An exception occurred while invoking constructor of CargoPlane");
-        assertEquals((double) (baseWeight + getSumReturnValue), returnValue, context, result ->
+            "An exception occurred while invoking mass()");
+        assertDoubleEquals(baseWeight + getSumReturnValue, returnValue, context, result ->
             "Method mass() returned an incorrect value");
     }
 

@@ -11,11 +11,11 @@ import org.tudalgo.algoutils.tutor.general.assertions.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Locale;
 import java.util.Set;
 
+import static h05.TestUtils.*;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
@@ -110,16 +110,16 @@ public class PlaneTest {
             System.setOut(old);
         }
 
-        assertEquals(
+        assertStringEquals(
             "The Tank of Plane %s has overflowed!".formatted(aircraftRegistration),
-            outputStream.toString().strip(),
+            outputStream.toString(),
             context,
             result -> "The message printed by method refuel is incorrect"
         );
     }
 
     @Test
-    public void testGetFuelConsumptionPerKilometer() throws ReflectiveOperationException {
+    public void testGetFuelConsumptionPerKilometer() {
         MethodHeader getFuelConsumptionPerKilometer = assertNotNull(
             getOriginalMethodHeader(Plane.class, "getFuelConsumptionPerKilometer"),
             emptyContext(), result -> "Could not find method 'getFuelConsumptionPerKilometer()'");
@@ -128,7 +128,7 @@ public class PlaneTest {
         assertEquals(double.class, getFuelConsumptionPerKilometer.getReturnType(), emptyContext(),
             result -> "Return type of 'getFuelConsumptionPerKilometer()' is incorrect");
 
-        Field fuelTypeField = Plane.class.getDeclaredField("fuelType");
+        FieldHeader fuelTypeField = FieldHeader.of(Plane.class, "fuelType");
         AtomicDouble massValue = new AtomicDouble();
         Plane planeInstance = new Plane("D-ABCD", 0, FuelType.JetA, 1000) {
             @Override
@@ -139,7 +139,7 @@ public class PlaneTest {
 
         Delegation.disable(MethodHeader.of(Plane.class, "getFuelConsumptionPerKilometer"));
         for (FuelType fuelType : FuelType.values()) {
-            fuelTypeField.set(planeInstance, fuelType);
+            fuelTypeField.setValue(planeInstance, fuelType);
             for (double mass = 10000; mass < 30000; mass += 5000) {
                 Context context = contextBuilder()
                     .add("fuelType", fuelType)
@@ -149,7 +149,7 @@ public class PlaneTest {
                 double expected = 1.1494e-4 * mass * fuelType.getConsumptionMultiplicator();
                 double actual = callObject(planeInstance::getFuelConsumptionPerKilometer, context, result ->
                     "An exception occurred while invoking 'getFuelConsumptionPerKilometer()'");
-                assertEquals(expected, actual, context, result ->
+                assertDoubleEquals(expected, actual, context, result ->
                     "Return value of method 'getFuelConsumptionPerKilometer()' is incorrect");
             }
         }
@@ -163,10 +163,7 @@ public class PlaneTest {
             "Method 'fly(double)' is not public");
         assertEquals(void.class, fly.getReturnType(), emptyContext(), result ->
             "Return type of method 'fly(double)' is incorrect");
-        Airspace airspace = Airspace.get();
-        Set.copyOf(airspace.getFlyingInAirspace())
-            .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                "An exception occurred while invoking 'Airspace.deregister(Flying)'"));
+        TestUtils.clearAirspace();
 
         PrintStream originalOut = System.out;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -175,7 +172,7 @@ public class PlaneTest {
         try {
             String aircraftRegistration = "D-ABCD";
             double currentFuelLevel = 5;
-            Field currentFuelLevelField = Plane.class.getDeclaredField("currentFuelLevel");
+            FieldHeader currentFuelLevelField = FieldHeader.of(Plane.class, "currentFuelLevel");
             Plane planeInstance = new Plane(aircraftRegistration, 0, FuelType.JetA, 1000) {
                 @Override
                 protected double mass() {
@@ -185,7 +182,7 @@ public class PlaneTest {
 
             Delegation.disable(MethodHeader.of(Plane.class, "fly", double.class));
             Substitution.enable(MethodHeader.of(Plane.class, "getFuelConsumptionPerKilometer"), invocation -> 1d);
-            currentFuelLevelField.set(planeInstance, currentFuelLevel);
+            currentFuelLevelField.setValue(planeInstance, currentFuelLevel);
             for (double distance : new double[] {1_000_000, 1}) {
                 Context context = contextBuilder()
                     .add("aircraftRegistration", aircraftRegistration)
@@ -196,27 +193,25 @@ public class PlaneTest {
                 outputStream.reset();
                 call(() -> planeInstance.fly(distance), context, result -> "An exception occurred while invoking method fly");
                 if (distance > currentFuelLevel) {
-                    assertEquals(
+                    assertStringEquals(
                         String.format((Locale) null, "Plane %s does not have enough fuel to fly %.1f km.", aircraftRegistration, distance),
                         outputStream.toString().trim(),
                         context,
                         result -> "Method fly did not print the correct string"
                     );
-                    assertEquals(currentFuelLevel, currentFuelLevelField.get(planeInstance), context, result ->
+                    assertEquals(currentFuelLevel, currentFuelLevelField.getValue(planeInstance), context, result ->
                         "Plane does not have enough fuel to fly but currentFuelLevel was modified");
                 } else {
-                    assertEquals(
+                    assertStringEquals(
                         String.format((Locale) null, "Plane %s flew %.1f km and has %.1f liters of fuel left.", aircraftRegistration, distance, currentFuelLevel - 1),
                         outputStream.toString().trim(),
                         context,
                         result -> "Method fly did not print the correct string"
                     );
-                    assertEquals(currentFuelLevel - 1, currentFuelLevelField.get(planeInstance), context, result ->
+                    assertEquals(currentFuelLevel - 1, currentFuelLevelField.getValue(planeInstance), context, result ->
                         "Plane had enough fuel to fly but currentFuelLevel was not set to the correct value");
                 }
             }
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
         } finally {
             System.setOut(originalOut);
         }
@@ -233,9 +228,7 @@ public class PlaneTest {
         };
 
         Delegation.disable(MethodHeader.of(Plane.class, "takeOff"));
-        Set.copyOf(airspace.getFlyingInAirspace())
-            .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                "An exception occurred while invoking 'Airspace.deregister(Flying)'"));
+        TestUtils.clearAirspace();
         call(planeInstance::takeOff, emptyContext(), result ->
             "An exception occurred while invoking method takeOff");
         Set<?> flyingInAirspace = airspace.getFlyingInAirspace();

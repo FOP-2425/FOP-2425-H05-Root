@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Set;
 
+import static h05.TestUtils.assertStringEquals;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
@@ -29,14 +30,12 @@ public class AirspaceTest {
 
         try {
             Airspace airspace = Airspace.get();
-            Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                    "An exception occurred while invoking deregister(Flying)"));
+            TestUtils.clearAirspace();
 
             Delegation.disable(MethodHeader.of(Airspace.class, "scanAirspace"));
             call(airspace::scanAirspace, emptyContext(), result -> "An exception occurred while invoking scanAirspace()");
-            assertEquals("Scanning...\nAirspace is empty", outputStream.toString().strip(), emptyContext(),
-                result -> "scanAirspace() printed to wrong message to System.out");
+            assertStringEquals("Scanning...\nAirspace is empty", outputStream.toString(), emptyContext(),
+                result -> "scanAirspace() printed the wrong message to System.out");
         } finally {
             System.setOut(oldOut);
         }
@@ -55,18 +54,16 @@ public class AirspaceTest {
                 .add("plane in airspace", cargoPlaneInstance)
                 .build();
             Airspace airspace = Airspace.get();
-            Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                    "An exception occurred while invoking deregister(Flying)"));
+            TestUtils.clearAirspace();
 
             Delegation.disable(MethodHeader.of(Airspace.class, "register", Flying.class));
             call(() -> airspace.register(cargoPlaneInstance), context, result ->
                 "An exception occurred while invoking register(Flying)");
             call(airspace::scanAirspace, emptyContext(), result -> "An exception occurred while invoking scanAirspace()");
-            assertEquals("Scanning...\n%s is flying in airspace".formatted(aircraftRegistration),
-                outputStream.toString().strip(),
-                emptyContext(),
-                result -> "scanAirspace() printed to wrong message to System.out");
+            assertStringEquals("Scanning...\n%s is flying in airspace".formatted(aircraftRegistration),
+                outputStream.toString(),
+                context,
+                result -> "scanAirspace() printed the wrong message to System.out");
         } finally {
             System.setOut(oldOut);
         }
@@ -87,18 +84,16 @@ public class AirspaceTest {
                 .add("plane in airspace", passengerPlaneInstance)
                 .build();
             Airspace airspace = Airspace.get();
-            Set.copyOf(airspace.getFlyingInAirspace())
-                .forEach(flying -> call(() -> airspace.deregister(flying), emptyContext(), result ->
-                    "An exception occurred while invoking deregister(Flying)"));
+            TestUtils.clearAirspace();
 
             Delegation.disable(MethodHeader.of(Airspace.class, "register", Flying.class));
             call(() -> airspace.register(passengerPlaneInstance), context, result ->
                 "An exception occurred while invoking register(Flying)");
             call(airspace::scanAirspace, emptyContext(), result -> "An exception occurred while invoking scanAirspace()");
-            assertEquals("Scanning...\n%s is flying in airspace (%d PAX)".formatted(aircraftRegistration, passengerCount),
-                outputStream.toString().strip(),
-                emptyContext(),
-                result -> "scanAirspace() printed to wrong message to System.out");
+            assertStringEquals("Scanning...\n%s is flying in airspace (%d PAX)".formatted(aircraftRegistration, passengerCount),
+                outputStream.toString(),
+                context,
+                result -> "scanAirspace() printed the wrong message to System.out");
         } finally {
             System.setOut(oldOut);
         }

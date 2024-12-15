@@ -12,6 +12,7 @@ import org.tudalgo.algoutils.tutor.general.assertions.Context;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import static h05.TestUtils.assertDoubleEquals;
 import static org.tudalgo.algoutils.transform.SubmissionExecutionHandler.*;
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
@@ -51,25 +52,21 @@ public class TankTest {
             }
 
             @Override
-            public double getCurrentFuelLevel() {
-                return initialFuelLevel;
-            }
-
-            @Override
             public void refuel(double amount) {
                 refuelAmount.set(amount);
             }
         };
+        FieldHeader.of(Plane.class, "currentFuelLevel").setValue(planeInstance, initialFuelLevel);
         Context context = contextBuilder()
-            .add("plane.getFuelType()", fuelType)
-            .add("plane.getFuelCapacity()", fuelCapacity)
-            .add("plane.getCurrentFuelLevel()", initialFuelLevel)
+            .add("plane.fuelType", fuelType)
+            .add("plane.fuelCapacity", fuelCapacity)
+            .add("plane.currentFuelLevel", initialFuelLevel)
             .build();
 
         Delegation.disable(MethodHeader.of(Tank.class, "refuelPlane", Plane.class));
         call(() -> tankInstance.refuelPlane(planeInstance), context, result ->
             "An exception occurred while invoking refuelPlane(Plane)");
-        assertEquals(fuelCapacity - initialFuelLevel, refuelAmount.get(), context, result ->
+        assertDoubleEquals(fuelCapacity - initialFuelLevel, refuelAmount.get(), context, result ->
             "refuelPlane(Plane) did not pass the correct value to plane.refuel(double)");
     }
 
