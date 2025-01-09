@@ -83,3 +83,6 @@ gradle-app.setting
 .gradletasknamecache
 
 *.hprof
+screenshots/
+
+jagr.conf
