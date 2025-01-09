@@ -65,6 +65,7 @@ public abstract class Plane implements Flying {
         currentFuelLevel += amount;
 
         if(currentFuelLevel > fuelCapacity){
+            currentFuelLevel = fuelCapacity;
             System.out.println("The Tank of Plane " + aircraftRegistration + " has overflowed!");
         }
     }

@@ -1,0 +1,58 @@
+[
+  {
+    "invocation": 0,
+    "airspaceState": [
+      ""
+    ]
+  },
+  {
+    "invocation": 1,
+    "airspaceState": [
+      "Airspace is empty"
+    ]
+  },
+  {
+    "invocation": 2,
+    "airspaceState": [
+      "GAG-67 is flying in airspace (100 PAX)",
+      "WeatherBalloon 99 is flying in airspace"
+    ]
+  },
+  {
+    "invocation": 3,
+    "airspaceState": [
+      "GAG-67 is flying in airspace (0 PAX)",
+      "WeatherBalloon 99 is flying in airspace"
+    ]
+  },
+  {
+    "invocation": 4,
+    "airspaceState": [
+      "GAG-67 is flying in airspace (0 PAX)",
+      "WeatherBalloon 99 is flying in airspace",
+      "D-AFFF is flying in airspace"
+    ]
+  },
+  {
+    "invocation": 5,
+    "airspaceState": [
+      "GAG-67 is flying in airspace (0 PAX)",
+      "WeatherBalloon 99 is flying in airspace",
+      "D-AFFF is flying in airspace",
+      "D-ABBB is flying in airspace (30 PAX)"
+    ]
+  },
+  {
+    "invocation": 6,
+    "airspaceState": [
+      "GAG-67 is flying in airspace (0 PAX)",
+      "WeatherBalloon 99 is flying in airspace"
+    ]
+  },
+  {
+    "invocation": 7,
+    "airspaceState": [
+      "GAG-67 is flying in airspace (0 PAX)"
+    ]
+  }
+]

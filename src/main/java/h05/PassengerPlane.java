@@ -2,7 +2,7 @@ package h05;
 
 public class PassengerPlane extends Plane implements CarriesPassengers {
 
-    protected static final char AVERAGE_PEOPLE_WEIGHT = 95;
+    protected static final char AVERAGE_PEOPLE_WEIGHT = 100;
     protected static final char AVERAGE_LUGGAGE_WEIGHT = 15;
 
     private int passengerCount = 0;

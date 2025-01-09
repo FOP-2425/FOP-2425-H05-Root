@@ -3,7 +3,7 @@ package h05;
 
 public class CombinedPlane extends PassengerPlane implements CarriesCargo{
 
-    private final Stack containers = new Stack();
+    private final CargoStack containers = new CargoStack();
 
 
     public CombinedPlane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel, int crew) {

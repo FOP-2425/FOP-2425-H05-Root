@@ -6,7 +6,7 @@ public class CargoPlane extends Plane implements CarriesCargo{
     Stacks are a type of data structure that follows the Last In First Out (LIFO) principle.
     Explanation will be found in Task description.
  */
-    private final Stack containers = new Stack();
+    private final CargoStack containers = new CargoStack();
 
     public CargoPlane(String aircraftRegistration, int baseWeight, FuelType fuelType, double maxFuelLevel) {
         super(aircraftRegistration, baseWeight, fuelType, maxFuelLevel);
